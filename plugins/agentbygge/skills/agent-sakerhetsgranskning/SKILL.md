@@ -45,7 +45,7 @@ En avvikelse som döljer A, B eller C är ett fynd med allvar **hög**, även om
 
 ### 4. Bedöm OWASP-punkterna
 
-Läs `references/owasp-asi.md`. Skriv en bedömning för varje relevant punkt:
+Läs `references/owasp-asi.md`. Den bygger på OWASP:s original och har ett avsnitt om hur ett fynd ska klassas, till exempel att ASI08 gäller spridningen av ett fel och inte dess ursprung. Skriv en bedömning för varje relevant punkt:
 - vad som kan hända just här
 - vilka kontroller som finns (`kontroller_som_finns`)
 - vilka fynd punkten ger

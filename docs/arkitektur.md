@@ -1,4 +1,4 @@
-# Arkitektur för agentbygget (version 3, 2026-11-21)
+# Arkitektur för agentbygget (version 4, 2026-11-21)
 
 **Master.** Det här dokumentet är `claude/agent-arkitektur.md` i Claude-projektet "AI agenter". Spegeln ligger i repot som `docs/arkitektur.md`. Hur de hålls lika står i *Så hålls dokumentet aktuellt* längst ned.
 
@@ -10,7 +10,7 @@ Skillsen beskriver inte hur agenter byggs. De kör en byggkedja: modellen skrive
 
 1. **Det som körs har git som master.** Kod, skills, scheman och kontrakt ändras genom pull requests i GitHub. Det du tänker i, som det här dokumentet, får ha Claude-projektet som master, så länge varje version också hamnar i git.
 2. **Modellen märker, koden verkar.** Allt som kod kan avgöra avgör kod: schemat, risknivån, grinden vid oåterkalleliga handlingar och kraven på provsamlingen. En skill anropar skripten i stället för att bedöma själv.
-3. **Lägsta sort först.** Motor före AI-steg, AI-steg före agent. En agent planerar egna steg och används bara där vägen inte kan bestämmas i förväg (Anthropic, *Building effective agents*).
+3. **Lägsta sort först.** Motor före AI-steg, AI-steg före agent. En agent planerar egna steg och används bara där vägen inte kan bestämmas i förväg (Anthropic, *Building effective agents*). OWASP kallar samma sak minsta möjliga agentmakt (least agency): självständighet där den inte behövs ökar attackytan utan att tillföra något.
 4. **Högst två av tre.** Inom en session får en agent ha högst två av egenskaperna A (opålitlig indata), B (känslig data) och C (ändrar tillstånd eller kommunicerar externt utan godkännande före varje handling) (Meta, *Agents Rule of Two*).
 5. **Grind vid irreversibilitet.** En oåterkallelig handling kräver alltid en människas godkännande före varje handling.
 6. **Djupet följer risken.** Risknivån bestämmer hur mycket granskning, test och skugga en agent behöver. En person ska orka förvalta det.
@@ -48,7 +48,7 @@ Det finns ingen orkestrerande skill. Varje skill slutar med att peka på nästa 
 | Skill | Gör | Vilar på | Status |
 |---|---|---|---|
 | `agent-kontrakt` | Från behov till kontrakt: datagrinden, sfären, behovet (med `arkitektur-begreppsmodell`), sorten, resurserna, Rule of Two och risknivå med `scripts/risk.py`, uppdelning vid nivå 3, validering och leverans per sfär. För System Insight blir resultatet en post i `contracts.ts`, och avvikelser från posten redovisas som fynd. | `schema/agentkontrakt.schema.json`, `scripts/` | Byggd (steg 2) |
-| `agent-sakerhetsgranskning` | `scripts/granska.py förbered` validerar, räknar Rule of Two, gör automatiska fynd och avgör vilka av ASI01–ASI10 som är relevanta. Granskaren prövar kontraktets flaggor mot koden och bedömer punkterna. `granska.py slutför` räknar utfallet: underkänd om ett fynd med allvar hög är öppet. Automatiska fynd kan inte tas bort, och bara en person kan acceptera en risk. | OWASP (andra hand), Meta, NCCoE | Byggd (steg 3) |
+| `agent-sakerhetsgranskning` | `scripts/granska.py förbered` validerar, räknar Rule of Two, gör automatiska fynd och avgör vilka av ASI01–ASI10 som är relevanta. Granskaren prövar kontraktets flaggor mot koden och bedömer punkterna. `granska.py slutför` räknar utfallet: underkänd om ett fynd med allvar hög är öppet. Automatiska fynd kan inte tas bort, och bara en person kan acceptera en risk. | OWASP (original), Meta, NCCoE | Byggd (steg 3) |
 | `agent-evals` | Facit ur verkliga fel, injektionsfall i varje fält som kommer utifrån, inspelade svar för regression och bedömning av utfall, inte väg. Mönstret kommer från System Insights `src/lib/eval`. | Anthropic, *Demystifying evals* | Steg 4 |
 | `agent-drift` | Registrering, start i skugga, kriterier för befordran, budget, nödstopp, månadsgranskning och avveckling med återkallade nycklar. | System Insights register | Steg 5 |
 
@@ -91,9 +91,9 @@ Exemplet är Yahoo-rensningen. I en enda session blir den nivå 3, eftersom mejl
 
 - **Rule of Two** är första spärren och räknas av kod.
 - **OWASP Top 10 for Agentic Applications 2026** är fördjupningen: ASI01 Agent Goal Hijack, ASI02 Tool Misuse and Exploitation, ASI03 Identity and Privilege Abuse, ASI04 Agentic Supply Chain Vulnerabilities, ASI05 Unexpected Code Execution (RCE), ASI06 Memory & Context Poisoning, ASI07 Insecure Inter-Agent Communication, ASI08 Cascading Failures, ASI09 Human-Agent Trust Exploitation och ASI10 Rogue Agents.
-  - Titlarna är bekräftade i flera källor.
-  - OWASP:s egna åtgärdstexter är inte lästa i original. PDF:en saknar textlager och gick inte att läsa i sessionen.
-  - Skillens kontrollfrågor (`references/owasp-asi.md`) bygger alltså på andra hand och uppgraderas när PDF:en är läst.
+  - Listan är läst i original (version 2026, december 2025). `references/owasp-asi.md` sammanfattar varje punkt med OWASP:s rekommendationer och reglerna för hur ett fynd ska klassas.
+  - Originalet är licensierat CC BY-SA 4.0, så bearbetningen lyder under samma licens.
+- **Observerbarhet:** OWASP kallar den icke förhandlingsbar. Varje agent ska logga vad den gör, varför och med vilka verktyg, under sin egen identitet.
 - **Identitet:** egna, avgränsade och helst kortlivade nycklar per agent. Nycklarnas namn och omfång står i kontraktet, aldrig deras värden.
 - **Leverantörskedjan:** externa MCP-servrar och skills är kod som körs. Läs innan installation, lås versioner och använd bara källor på nivå 1–2. Det gäller också skills som Claude skriver.
 - **Godkännandetrötthet:** godkännanden krävs bara för oåterkalleliga handlingar och visar rådata, inte agentens sammanfattning (ASI09).
@@ -182,8 +182,7 @@ Lovables undantag från grenskyddet är en accepterad risk som omprövas före f
 4. **Agent Skills-specen** ska läsas i original och stämmas av mot validatorn, som i dag följer Anthropics egen uppladdningskontroll.
 5. **Pilot för `agent-drift`.** Yahoo-rensningen är struken från steg 2. Två saker är öppna: vilken pilot steg 5 ska ha, och om exemplen i `schema/exempel/` ska bytas ut.
 6. **En oberoende körning av `agent-kontrakt` och `agent-sakerhetsgranskning`**, med `claude plugin eval` eller i månadsgranskningen, så att skillsen inte bara är prövade av den session som skrev dem.
-7. **OWASP-PDF:en i original.** Ladda ner OWASP-Top-10-for-Agentic-Applications-2026-12.6-1.pdf från OWASP och bifoga den. Då läses sidorna, och `references/owasp-asi.md` och källregistret uppgraderas.
-8. **Besluten i System Insight:** #241 (OAuth-klienter), #242 (Planerarens automatiska läge) och #247 (skydd för masterdokumentet).
+7. **Besluten i System Insight:** #241 (OAuth-klienter), #242 (Planerarens automatiska läge) och #247 (skydd för masterdokumentet).
 
 ## Så hålls dokumentet aktuellt
 
@@ -195,6 +194,7 @@ Lovables undantag från grenskyddet är en accepterad risk som omprövas före f
 
 ## Ändringslogg
 
+- Version 4 (2026-11-21): OWASP Top 10 for Agentic Applications är läst i original, och skillens referens och källregistret är uppgraderade. Principen om minsta möjliga agentmakt och kravet på observerbarhet är införda. Det öppna beslutet om PDF:en är struket, och besluten i System Insight är nu nummer 7. Planerarens fynd i System Insight klassas under ASI08 i stället för ASI10.
 - Version 3 (2026-11-21): steg 3 klart. `agent-sakerhetsgranskning` är byggd, med `scripts/granska.py`, ett schema för granskning, sju testfall och provkörning 1. Granskningen av System Insight är klar: PR #240 och issues #241–#248. OWASP-titlarna är rättade efter källorna, och det är skrivet att OWASP används i andra hand. De öppna besluten 7 och 8 är nya.
 - Version 2 (2026-11-21): steg 2 klart. `agent-kontrakt` är byggd, med tio testfall, en jämförare och provkörning 1. Kontraktet har fått effekten `rad` och `styrs_av_modellen` med `kodstyrning`. Provsamlingens krav gäller när agenten är påslagen. Fynden om System Insight har lagts till, Yahoo-rensningen är struken som facit och pilot, och de öppna besluten 5 och 6 är nya.
 - Version 1 (2026-11-21): första versionen. Principer, placering, byggkedjan, kontraktet, risknivåer, säkerhetskärnan, kvalitet över tid, release, källor, System Insight, byggordning och öppna beslut. Steg 1 klart.

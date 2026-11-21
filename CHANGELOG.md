@@ -1,5 +1,16 @@
 # Ändringslogg
 
+## 2026-11-21 · OWASP i original
+
+- `agent-sakerhetsgranskning/references/owasp-asi.md` är omskriven från OWASP Top 10 for Agentic Applications 2026 (version 2026, december 2025). Den har:
+  - beskrivning, typiska svagheter och OWASP:s rekommendationer per punkt
+  - reglerna för hur ett fynd ska klassas
+  - principerna om minsta möjliga agentmakt och observerbarhet
+  - licens CC BY-SA 4.0 för bearbetningen
+- Källregistret: `owasp-agentic-top10-2026` är läst i original och bär beslut.
+- Testfallet för Planeraren väntar sig ASI02 eller ASI08.
+- `docs/arkitektur.md` version 4.
+
 ## 2026-11-21 · steg 3
 
 - Skillen `agent-sakerhetsgranskning`: arbetsgång i åtta steg, referenser om OWASP ASI01–ASI10 (andra hand), allvar och acceptans, och System Insight, med synkade kopior av skripten och schemana.
