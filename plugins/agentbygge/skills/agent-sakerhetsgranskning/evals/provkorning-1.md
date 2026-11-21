@@ -20,6 +20,6 @@ En oberoende körning görs med `claude plugin eval . --allow-tools Write,Edit,B
 
 Två fall prövar det som bara en granskare kan se: felmarkerad-hamtning och datagrind-dold. Där klarar kontraktet valideringen, men flaggorna motsägs av resursernas beskrivning. Repots tester visar att jämföraren fäller en granskning som missar det dolda C, och att den upptäcker ett utfall som skrivits för hand.
 
-## Begränsning
+## OWASP
 
-OWASP Top 10 for Agentic Applications är använd i andra hand. PDF:en gick att hämta i webbläsaren men saknar textlager, och att läsa den med pdf.js nekades. Titlarna är bekräftade i flera källor, men OWASP:s egna åtgärdstexter är inte lästa.
+Provkörningen gjordes med OWASP i andra hand. Samma kväll lästes originalet in, och `references/owasp-asi.md` skrevs om. Det ändrade inga utfall, men Planerarens fynd klassas nu under ASI02 och ASI08 i stället för ASI10.
