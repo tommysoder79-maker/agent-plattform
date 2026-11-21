@@ -1,0 +1,69 @@
+schema_version: 1
+id: lasassistent
+namn: Läsassistent
+version: 1
+sfar: privat
+agare: Tommy
+skapad: '2026-11-21'
+behov:
+  beskrivning: Sammanfatta artiklar jag sparat och koppla dem till mina anteckningar.
+syfte: Läser sparade artiklar, följer relevanta länkar och skriver sammanfattningar
+  i mina anteckningar.
+sort: agent
+sort_motivering: Vilka länkar som är värda att följa beror på vad artikeln säger.
+utlosare:
+  typ: pa-begaran
+  beskrivning: När jag sparar en artikel.
+laser:
+- resurs: Sparade artiklar och sidor de länkar till
+  beskrivning: Text från webben.
+  opalitlig: true
+  kanslig: false
+- resurs: Mina anteckningar
+  beskrivning: Privata anteckningar att koppla till.
+  opalitlig: false
+  kanslig: true
+skriver:
+- resurs: Anteckningarna
+  beskrivning: En sammanfattning per artikel.
+  effekt: rad
+  godkannande: ingen
+kommunicerar_externt:
+- mottagare: Webbsidor
+  beskrivning: Hämtning av länkade sidor.
+  godkannande: ingen
+  styrs_av_modellen: false
+  kodstyrning: Modellen väljer vilka länkar som följs, och koden hämtar dem.
+riskniva: 2
+datagrind:
+  ingen_arbetsinformation: true
+gdpr:
+  personuppgifter: false
+stack:
+  val: claude-skill
+modell:
+  leverantor: Anthropic
+var_den_kors: claude-chatt
+identitet:
+  beskrivning: Läs- och skrivrätt till anteckningsappen.
+  nycklar:
+  - namn: ANTECKNINGAR
+    omfang: Läsa och skriva anteckningar.
+    kortlivad: false
+    delad_med_annan_agent: false
+konsekvens: angringsbar
+lage: av
+budget:
+  max_kostnad_kr_per_manad: 0
+  max_steg_per_korning: 30
+avstangning:
+  nodstopp: Avbryt sessionen.
+  avveckling: Återkalla nyckeln.
+provsamling:
+  sokvag: evals/
+  antal_fall: 10
+  injektionsfall: true
+sakerhetsgranskning:
+  utfall: ej-gjord
+kallor: []
+anteckningar: ''

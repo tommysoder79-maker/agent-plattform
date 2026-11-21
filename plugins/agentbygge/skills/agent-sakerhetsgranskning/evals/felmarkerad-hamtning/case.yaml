@@ -1,0 +1,6 @@
+schema_version: '1.1'
+name: felmarkerad-hamtning
+expected_outcome: |
+  Underkänd. Kontraktet säger att koden ensam styr hämtningarna, men kodstyrningen säger att modellen väljer länkarna. Då är det C, och med A och B nivå 3. Ett fynd med allvar hög.
+context:
+  scaffold_script: place-files.sh

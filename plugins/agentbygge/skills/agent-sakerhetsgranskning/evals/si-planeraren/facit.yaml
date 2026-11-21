@@ -1,0 +1,10 @@
+# Läses av jamfor_facit.py. Skrivs av skapa_fall.py.
+utfall: godkand
+hog: false
+fynd_med:
+  allvar:
+  - medel
+  - hog
+  asi:
+  - ASI02
+  - ASI10

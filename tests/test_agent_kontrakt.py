@@ -11,8 +11,20 @@ from validera_kontrakt import las_yaml
 from validera_skills import validera_skill
 
 SKILL = ROT / "plugins" / "agentbygge" / "skills" / "agent-kontrakt"
-sys.path.insert(0, str(SKILL / "evals"))
-from jamfor_facit import jamfor  # noqa: E402
+
+
+def _ladda(namn, fil):
+    """Laddar en jämförare via sökväg: båda skillsen har en modul som heter jamfor_facit."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(namn, fil)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[namn] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+jamfor = _ladda("jamfor_facit_kontrakt", SKILL / "evals" / "jamfor_facit.py").jamfor
 
 
 def test_skillen_ar_giltig():

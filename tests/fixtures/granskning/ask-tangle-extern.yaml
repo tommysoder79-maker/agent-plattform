@@ -1,0 +1,73 @@
+schema_version: 1
+version: 1
+agare: Tommy
+skapad: '2026-11-21'
+datagrind:
+  ingen_arbetsinformation: true
+sakerhetsgranskning:
+  utfall: ej-gjord
+lage: av
+sfar: complexity-insight
+gdpr:
+  personuppgifter: false
+  kommentar: Organisationens material. Behandling av kunders personuppgifter regleras
+    i plattformens biträdesavtal (öppet beslut 9).
+stack:
+  val: system-insight-modul
+var_den_kors: system-insight
+identitet:
+  beskrivning: Modulens identitet per organisation (module_actor, MA-01). Modellnycklarna
+    läses bara av aiFetch.
+  nycklar: []
+avstangning:
+  nodstopp: Modulens brytare i registret, eller organisationens paus.
+  avveckling: Stäng av regeln i registret; modulen har inga egna nycklar.
+id: ask-tangle-extern
+namn: Fråga härvan för externa klienter (ask_tangle_v1)
+behov:
+  beskrivning: Samma svar för agenter utanför plattformen.
+syfte: Svarar externa klienter genom MCP-dörren, bara ur material med licensnivå G.
+laser:
+- resurs: tangle_search och signal_evidence, bara licensnivå G
+  beskrivning: Öppna observationer.
+  opalitlig: true
+  kanslig: false
+skriver:
+- resurs: tangle_questions
+  beskrivning: Frågan och svaret.
+  effekt: rad
+  godkannande: ingen
+kommunicerar_externt:
+- mottagare: Den externa klienten (MCP, ask_tangle_v1)
+  beskrivning: Svaret som modellen skrivit.
+  godkannande: ingen
+konsekvens: angringsbar
+provsamling:
+  sokvag: src/lib/eval/sets/tangle.ts
+  antal_fall: 25
+  injektionsfall: true
+anteckningar: Förutsätter att även personer som loggat in med OAuth får bara licensnivå
+  G genom den här dörren. I dag får de sina egna rättigheter.
+sort: ai-steg
+sort_motivering: Koden söker (ord, betydelse, grafen) och hämtar beläggen; modellen
+  skriver svaret i ett anrop och koden tar bort påståenden utan källa.
+utlosare:
+  typ: pa-begaran
+  beskrivning: En fråga.
+modell:
+  leverantor: Lovables gateway
+  modell: rutten suggest
+  region: USA och EU (beslut 6)
+budget:
+  max_kostnad_kr_per_manad: 5
+  max_steg_per_korning: 1
+riskniva: 2
+uppdelning:
+  beskrivning: Appens svar och dörren för externa klienter har olika omfång, så att
+    ingen del har A, B och C.
+  delar:
+  - ask-tangle-app
+  - ask-tangle-extern
+kallor:
+- meta-rule-of-two
+- nccoe-agent-identity

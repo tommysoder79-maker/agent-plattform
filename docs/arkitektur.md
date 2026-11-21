@@ -1,4 +1,4 @@
-# Arkitektur för agentbygget (version 2, 2026-11-21)
+# Arkitektur för agentbygget (version 3, 2026-11-21)
 
 **Master.** Det här dokumentet är `claude/agent-arkitektur.md` i Claude-projektet "AI agenter". Spegeln ligger i repot som `docs/arkitektur.md`. Hur de hålls lika står i *Så hålls dokumentet aktuellt* längst ned.
 
@@ -48,7 +48,7 @@ Det finns ingen orkestrerande skill. Varje skill slutar med att peka på nästa 
 | Skill | Gör | Vilar på | Status |
 |---|---|---|---|
 | `agent-kontrakt` | Från behov till kontrakt: datagrinden, sfären, behovet (med `arkitektur-begreppsmodell`), sorten, resurserna, Rule of Two och risknivå med `scripts/risk.py`, uppdelning vid nivå 3, validering och leverans per sfär. För System Insight blir resultatet en post i `contracts.ts`, och avvikelser från posten redovisas som fynd. | `schema/agentkontrakt.schema.json`, `scripts/` | Byggd (steg 2) |
-| `agent-sakerhetsgranskning` | Deterministiska kontroller först (schema, datagrind, förbjudna kombinationer, hemligheter), sedan OWASP ASI01–ASI10 så långt risknivån kräver, identitet och behörighet, och leverantörskedjan för MCP-servrar och skills. På nivå 3 också `prova-mot-motstandare`. | OWASP, Meta, NCCoE | Steg 3 |
+| `agent-sakerhetsgranskning` | `scripts/granska.py förbered` validerar, räknar Rule of Two, gör automatiska fynd och avgör vilka av ASI01–ASI10 som är relevanta. Granskaren prövar kontraktets flaggor mot koden och bedömer punkterna. `granska.py slutför` räknar utfallet: underkänd om ett fynd med allvar hög är öppet. Automatiska fynd kan inte tas bort, och bara en person kan acceptera en risk. | OWASP (andra hand), Meta, NCCoE | Byggd (steg 3) |
 | `agent-evals` | Facit ur verkliga fel, injektionsfall i varje fält som kommer utifrån, inspelade svar för regression och bedömning av utfall, inte väg. Mönstret kommer från System Insights `src/lib/eval`. | Anthropic, *Demystifying evals* | Steg 4 |
 | `agent-drift` | Registrering, start i skugga, kriterier för befordran, budget, nödstopp, månadsgranskning och avveckling med återkallade nycklar. | System Insights register | Steg 5 |
 
@@ -90,7 +90,10 @@ Exemplet är Yahoo-rensningen. I en enda session blir den nivå 3, eftersom mejl
 ## Säkerhetskärnan
 
 - **Rule of Two** är första spärren och räknas av kod.
-- **OWASP Top 10 for Agentic Applications 2026** (ASI01 Agent Goal Hijack, ASI02 Tool Misuse and Exploitation, ASI03 Identity and Privilege Abuse, ASI04 leverantörskedjan, ASI05 Unexpected Code Execution, ASI06 förgiftning av minne och kontext, ASI07 osäker kommunikation mellan agenter, ASI08 kaskadfel, ASI09 Human-Agent Trust Exploitation, ASI10 Rogue Agents) är fördjupningen. Namnen är bekräftade i andra hand; OWASP:s PDF läses i original innan `agent-sakerhetsgranskning` byggs.
+- **OWASP Top 10 for Agentic Applications 2026** är fördjupningen: ASI01 Agent Goal Hijack, ASI02 Tool Misuse and Exploitation, ASI03 Identity and Privilege Abuse, ASI04 Agentic Supply Chain Vulnerabilities, ASI05 Unexpected Code Execution (RCE), ASI06 Memory & Context Poisoning, ASI07 Insecure Inter-Agent Communication, ASI08 Cascading Failures, ASI09 Human-Agent Trust Exploitation och ASI10 Rogue Agents.
+  - Titlarna är bekräftade i flera källor.
+  - OWASP:s egna åtgärdstexter är inte lästa i original. PDF:en saknar textlager och gick inte att läsa i sessionen.
+  - Skillens kontrollfrågor (`references/owasp-asi.md`) bygger alltså på andra hand och uppgraderas när PDF:en är läst.
 - **Identitet:** egna, avgränsade och helst kortlivade nycklar per agent. Nycklarnas namn och omfång står i kontraktet, aldrig deras värden.
 - **Leverantörskedjan:** externa MCP-servrar och skills är kod som körs. Läs innan installation, lås versioner och använd bara källor på nivå 1–2. Det gäller också skills som Claude skriver.
 - **Godkännandetrötthet:** godkännanden krävs bara för oåterkalleliga handlingar och visar rådata, inte agentens sammanfattning (ASI09).
@@ -139,6 +142,20 @@ System Insights agenter stannar i plattformen och styrs av dess eget kontrakt, s
 - regeln för mastern
 - uppgiften om A2A
 
+**Granskningen 2026-11-21** gjordes med `agent-sakerhetsgranskning` och ligger i `systeminsights` som `docs/granskning-agenter-2026-11-21/` (PR #240).
+- Alla moduler är godkända med villkor, utom Fråga härvans externa dörr, som är **underkänd**: `callerOf` begränsar bara registrerade maskinkunder till G, så OAuth-klienter får organisationens material.
+- Fynden finns som issues #241–#248:
+  - #241 OAuth-klienter (beslut)
+  - #242 Planerarens automatiska läge (beslut)
+  - #243 facit och injektionstester (kvar)
+  - #244 sort och consequence (rättelse)
+  - #245 ämnen till GDELT (kvar)
+  - #246 M-8 (kvar)
+  - #247 skydd för masterdokumentet (beslut)
+  - #248 A2A-uppgiften (rättelse)
+- #226 har fått en kommentar.
+- L-2 följs i #211 och M-4 i #231.
+
 Provkörningen av `agent-kontrakt` 2026-11-21 (`plugins/agentbygge/skills/agent-kontrakt/evals/provkorning-1.md`) gav ytterligare fynd till steg 3:
 - **Alla sex moduler är AI-steg.** Varje modul gör ett anrop med påtvingat verktygsval, men alla står som `agent` i `contracts.ts`.
 - **Fältet `consequence` används på två sätt.** Fyra moduler skriver förslag men står som `informational`, och Rödlaget skriver råd men står som `human`.
@@ -153,8 +170,8 @@ Lovables undantag från grenskyddet är en accepterad risk som omprövas före f
 |---|---|---|
 | 1 | Repona, schemat, validerarna, källregistret, CI och release | Klart 2026-11-21 |
 | 2 | `agent-kontrakt`, med System Insights sex moduler och fyra påhittade fall som facit (nivå 3 som delas upp, motor, datagrinden, två sfärer) | Klart 2026-11-21 |
-| 3 | `agent-sakerhetsgranskning`, första körningen på System Insight | Nästa |
-| 4 | `agent-evals`, först facit för Rödlaget, Spanaren och Alternativbyggaren | |
+| 3 | `agent-sakerhetsgranskning`, första körningen på System Insight (PR #240 och issues #241–#248 i `systeminsights`) | Klart 2026-11-21 |
+| 4 | `agent-evals`, först facit för Rödlaget, Spanaren och Alternativbyggaren (#243) | Nästa |
 | 5 | `agent-drift`, med en pilot som väljs senare | |
 
 ## Öppna beslut
@@ -164,7 +181,9 @@ Lovables undantag från grenskyddet är en accepterad risk som omprövas före f
 3. **Grenskydd** på båda repona: pull request och gröna kontroller.
 4. **Agent Skills-specen** ska läsas i original och stämmas av mot validatorn, som i dag följer Anthropics egen uppladdningskontroll.
 5. **Pilot för `agent-drift`.** Yahoo-rensningen är struken från steg 2. Två saker är öppna: vilken pilot steg 5 ska ha, och om exemplen i `schema/exempel/` ska bytas ut.
-6. **En oberoende körning av `agent-kontrakt`**, med `claude plugin eval` eller i månadsgranskningen, så att skillen inte bara är prövad av den session som skrev den.
+6. **En oberoende körning av `agent-kontrakt` och `agent-sakerhetsgranskning`**, med `claude plugin eval` eller i månadsgranskningen, så att skillsen inte bara är prövade av den session som skrev dem.
+7. **OWASP-PDF:en i original.** Ladda ner OWASP-Top-10-for-Agentic-Applications-2026-12.6-1.pdf från OWASP och bifoga den. Då läses sidorna, och `references/owasp-asi.md` och källregistret uppgraderas.
+8. **Besluten i System Insight:** #241 (OAuth-klienter), #242 (Planerarens automatiska läge) och #247 (skydd för masterdokumentet).
 
 ## Så hålls dokumentet aktuellt
 
@@ -176,5 +195,6 @@ Lovables undantag från grenskyddet är en accepterad risk som omprövas före f
 
 ## Ändringslogg
 
+- Version 3 (2026-11-21): steg 3 klart. `agent-sakerhetsgranskning` är byggd, med `scripts/granska.py`, ett schema för granskning, sju testfall och provkörning 1. Granskningen av System Insight är klar: PR #240 och issues #241–#248. OWASP-titlarna är rättade efter källorna, och det är skrivet att OWASP används i andra hand. De öppna besluten 7 och 8 är nya.
 - Version 2 (2026-11-21): steg 2 klart. `agent-kontrakt` är byggd, med tio testfall, en jämförare och provkörning 1. Kontraktet har fått effekten `rad` och `styrs_av_modellen` med `kodstyrning`. Provsamlingens krav gäller när agenten är påslagen. Fynden om System Insight har lagts till, Yahoo-rensningen är struken som facit och pilot, och de öppna besluten 5 och 6 är nya.
 - Version 1 (2026-11-21): första versionen. Principer, placering, byggkedjan, kontraktet, risknivåer, säkerhetskärnan, kvalitet över tid, release, källor, System Insight, byggordning och öppna beslut. Steg 1 klart.

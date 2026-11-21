@@ -1,0 +1,6 @@
+# Läses av jamfor_facit.py. Skrivs av skapa_fall.py.
+utfall: underkand
+hog: true
+hog_asi:
+- ASI01
+- ASI02

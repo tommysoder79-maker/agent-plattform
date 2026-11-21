@@ -1,0 +1,6 @@
+schema_version: '1.1'
+name: si-fraga-harvan-extern
+expected_outcome: |
+  Underkänd. Kontraktet räknar med att bara G lämnas ut, men koden ger OAuth-klienter organisationens material. Det döljer B, och verklig nivå är 3. Ett fynd med allvar hög under ASI03 eller ASI07.
+context:
+  scaffold_script: place-files.sh

@@ -1,0 +1,6 @@
+schema_version: '1.1'
+name: si-spanaren
+expected_outcome: |
+  Godkänd med villkor. Inga fynd med allvar hög. De automatiska fynden om facit och om data till GDELT finns kvar, och det saknade injektionstestet är ett fynd.
+context:
+  scaffold_script: place-files.sh

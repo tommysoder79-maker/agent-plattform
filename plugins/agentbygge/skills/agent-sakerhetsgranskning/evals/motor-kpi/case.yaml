@@ -1,0 +1,6 @@
+schema_version: '1.1'
+name: motor-kpi
+expected_outcome: |
+  Godkänd. Nivå 1, en motor utan modell; få OWASP-punkter är relevanta.
+context:
+  scaffold_script: place-files.sh
