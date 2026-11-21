@@ -135,7 +135,7 @@ kallor:
     verifierad: 2026-11-21
     bar_beslut: false
     galler: "Tio risker ASI01–ASI10 för agentiska system, publicerade 2025-12-09."
-    anmarkning: "Namnen på ASI01–ASI10 är bekräftade i flera sekundärkällor; OWASP:s webbsida listar dem inte. PDF:en läses i original innan skillen agent-sakerhetsgranskning byggs."
+    anmarkning: "Namnen på ASI01–ASI10 är bekräftade i flera sekundärkällor, bland dem FINOS AI Governance Framework (air-governance-framework.finos.org/references/owasp-asi). PDF:en (OWASP-Top-10-for-Agentic-Applications-2026-12.6-1.pdf, 1,3 MB) gick att hämta i webbläsaren 2026-11-21 men saknar textlager, och läsning med pdf.js nekades. Läses i original när filen bifogas; då uppdateras lasniva och skillen agent-sakerhetsgranskning."
 
   - id: meta-rule-of-two
     titel: "Agents Rule of Two: A Practical Approach to AI Agent Security"

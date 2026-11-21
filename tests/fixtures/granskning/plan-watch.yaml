@@ -1,0 +1,75 @@
+schema_version: 1
+version: 1
+agare: Tommy
+skapad: '2026-11-21'
+datagrind:
+  ingen_arbetsinformation: true
+sakerhetsgranskning:
+  utfall: ej-gjord
+lage: av
+sfar: complexity-insight
+gdpr:
+  personuppgifter: false
+  kommentar: Organisationens material. Behandling av kunders personuppgifter regleras
+    i plattformens biträdesavtal (öppet beslut 9).
+stack:
+  val: system-insight-modul
+var_den_kors: system-insight
+identitet:
+  beskrivning: Modulens identitet per organisation (module_actor, MA-01). Modellnycklarna
+    läses bara av aiFetch.
+  nycklar: []
+avstangning:
+  nodstopp: Modulens brytare i registret, eller organisationens paus.
+  avveckling: Stäng av regeln i registret; modulen har inga egna nycklar.
+id: plan-watch
+namn: Bevakaren som planerare
+behov:
+  beskrivning: Föreslå nästa hämtning eller analys per öppen beslutsfråga, så att
+    bevakningen hänger med.
+syfte: Väljer nästa steg bland kandidater som koden hittat och loggar planen; i skugga
+  jämförs den med analytikerns val.
+sort: ai-steg
+sort_motivering: Modellen väljer en gång bland kandidater som koden tagit fram, och
+  koden kör eller loggar valet utan att fråga modellen igen. Det är ett AI-steg, även
+  om det kallas planering.
+utlosare:
+  typ: schema
+  beskrivning: Dagligen.
+laser:
+- resurs: decision_cases (aldrig konfidentiella), watch_points
+  beskrivning: Organisationens beslutsfrågor och bevakningspunkter.
+  opalitlig: false
+  kanslig: true
+- resurs: signal_evidence, question_answers, tangle_search
+  beskrivning: Belägg och svar som bygger på observationer utifrån.
+  opalitlig: true
+  kanslig: true
+- resurs: source_freshness
+  beskrivning: Hur sena källorna är.
+  opalitlig: false
+  kanslig: false
+skriver:
+- resurs: agent_plans
+  beskrivning: Planen och dess logg; i skugga körs inget.
+  effekt: forslag
+  godkannande: ingen
+kommunicerar_externt: []
+riskniva: 2
+modell:
+  leverantor: Lovables gateway
+  modell: rutten synthesis
+  region: USA och EU (beslut 6)
+konsekvens: mansklig
+budget:
+  max_kostnad_kr_per_manad: 5
+  max_steg_per_korning: 1
+provsamling:
+  sokvag: src/lib/eval/sets/planner.ts
+  antal_fall: 20
+  injektionsfall: true
+kallor:
+- meta-rule-of-two
+anteckningar: Kontraktet gäller skuggläget, som modulen står i i dag. I automatiskt
+  läge körs läs- och hämtstegen som modellen valt utan godkännande, och då blir det
+  C.

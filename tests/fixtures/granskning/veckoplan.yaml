@@ -1,0 +1,63 @@
+schema_version: 1
+id: veckoplan
+namn: Veckoplanerare
+version: 1
+sfar: privat
+agare: Tommy
+skapad: '2026-11-21'
+behov:
+  beskrivning: Få en plan för veckan som tar hänsyn till allt jag har inbokat.
+syfte: Läser kalendrar och mejl och föreslår en veckoplan på söndagar.
+sort: ai-steg
+sort_motivering: Planen kräver att fritext i möten och mejl vägs ihop.
+utlosare:
+  typ: schema
+  beskrivning: Söndagar.
+laser:
+- resurs: Privata kalendern
+  beskrivning: Händelser.
+  opalitlig: true
+  kanslig: true
+- resurs: 'Outlook på jobbet: kalender och mejl'
+  beskrivning: Möten och mejl från veckan som kommer.
+  opalitlig: true
+  kanslig: true
+skriver:
+- resurs: Veckoplan till mig
+  beskrivning: Ett förslag att läsa.
+  effekt: rad
+  godkannande: ingen
+kommunicerar_externt: []
+riskniva: 2
+datagrind:
+  ingen_arbetsinformation: true
+gdpr:
+  personuppgifter: false
+stack:
+  val: claude-skill
+modell:
+  leverantor: Anthropic
+var_den_kors: claude-schemalagd-uppgift
+identitet:
+  beskrivning: Läsrätt till kalendrarna och inkorgen.
+  nycklar:
+  - namn: KALENDER_LAS
+    omfang: Läsa.
+    kortlivad: false
+    delad_med_annan_agent: false
+konsekvens: informativ
+lage: av
+budget:
+  max_kostnad_kr_per_manad: 0
+  max_steg_per_korning: 30
+avstangning:
+  nodstopp: Stoppa uppgiften.
+  avveckling: Återkalla nyckeln.
+provsamling:
+  sokvag: evals/
+  antal_fall: 10
+  injektionsfall: true
+sakerhetsgranskning:
+  utfall: ej-gjord
+kallor: []
+anteckningar: ''

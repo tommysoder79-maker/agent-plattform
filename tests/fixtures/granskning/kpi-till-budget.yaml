@@ -1,0 +1,72 @@
+schema_version: 1
+version: 1
+agare: Tommy
+skapad: '2026-11-21'
+datagrind:
+  ingen_arbetsinformation: true
+sakerhetsgranskning:
+  utfall: ej-gjord
+lage: av
+id: kpi-till-budget
+namn: KPI till budgetarket
+sfar: privat
+behov:
+  beskrivning: Följa inflationen i den egna budgeten och få veta när den rör sig mycket.
+syfte: Hämtar KPI från SCB varje månad, lägger till en rad i budgetarket och skickar
+  en notis vid en ändring över 0,5 procentenheter.
+sort: motor
+utlosare:
+  typ: schema
+  beskrivning: En gång i månaden, efter SCB:s publicering.
+laser:
+- resurs: SCB:s öppna API (KPI)
+  beskrivning: Ett tal ur ett känt format; ingen modell ser fritext.
+  opalitlig: false
+  kanslig: false
+- resurs: Budgetarket, föregående rad
+  beskrivning: Förra månadens värde.
+  opalitlig: false
+  kanslig: true
+skriver:
+- resurs: Budgetarket
+  beskrivning: En ny rad med månad och KPI.
+  effekt: angringsbar
+  godkannande: ingen
+  styrs_av_modellen: false
+  kodstyrning: Ingen modell. Skriptet skriver en rad med fasta fält.
+- resurs: Notis till ägaren
+  beskrivning: Ändringen i procentenheter.
+  effekt: rad
+  godkannande: ingen
+kommunicerar_externt: []
+riskniva: 1
+gdpr:
+  personuppgifter: false
+stack:
+  val: annan
+  motivering: Ett skript utan modell. En schemalagd Claude-uppgift vore en modellsession
+    och alltså ingen motor.
+modell:
+  leverantor: ingen
+var_den_kors: github-actions
+identitet:
+  beskrivning: Tjänstekonto med skrivrätt till ett enda kalkylark.
+  nycklar:
+  - namn: BUDGETARK_TJANSTEKONTO
+    omfang: Skriva i budgetarket, inget annat.
+    kortlivad: false
+    delad_med_annan_agent: false
+konsekvens: angringsbar
+budget:
+  max_kostnad_kr_per_manad: 0
+  max_steg_per_korning: 5
+avstangning:
+  nodstopp: Stäng av arbetsflödet i GitHub Actions.
+  avveckling: Ta bort tjänstekontots åtkomst till arket.
+provsamling:
+  sokvag: evals/
+  antal_fall: 5
+  injektionsfall: false
+  matt: Rätt rad och rätt notis för fem kända månader, också en utan ny publicering.
+kallor:
+- anthropic-building-effective-agents

@@ -26,6 +26,13 @@ SYNK: dict[str, list[str]] = {
         "schema/agentkontrakt.schema.json",
         "schema/agentregister.schema.json",
     ],
+    "plugins/agentbygge/skills/agent-sakerhetsgranskning": [
+        "scripts/granska.py",
+        "scripts/risk.py",
+        "scripts/validera_kontrakt.py",
+        "schema/agentkontrakt.schema.json",
+        "schema/granskning.schema.json",
+    ],
 }
 
 

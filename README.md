@@ -8,12 +8,14 @@ Arkitekturen beskrivs i [docs/arkitektur.md](docs/arkitektur.md).
 
 ```
 .claude-plugin/marketplace.json     marknadsplatsen (för Claude Code och en framtida synk)
-plugins/agentbygge/                 byggkedjans skills; agent-kontrakt är byggd
+plugins/agentbygge/                 byggkedjans skills; agent-kontrakt och agent-sakerhetsgranskning är byggda
 schema/agentkontrakt.schema.json    kontraktet för en agent
 schema/agentregister.schema.json    registret över en sfärs agenter
+schema/granskning.schema.json       en säkerhetsgranskning
 schema/exempel/                     exempelkontrakt: Yahoo-rensningen i två delar
 scripts/risk.py                     räknar Rule of Two och risknivå
 scripts/validera_kontrakt.py        validerar kontrakt och register
+scripts/granska.py                  förbereder och slutför en säkerhetsgranskning
 scripts/validera_skills.py          validerar skills och marknadsplatsen
 scripts/kontrollera_kallor.py       kontrollerar källregistret
 scripts/kontrollera_spegel.py       kontrollerar spegeln av masterdokumentet

@@ -1,5 +1,18 @@
 # Ändringslogg
 
+## 2026-11-21 · steg 3
+
+- Skillen `agent-sakerhetsgranskning`: arbetsgång i åtta steg, referenser om OWASP ASI01–ASI10 (andra hand), allvar och acceptans, och System Insight, med synkade kopior av skripten och schemana.
+- `scripts/granska.py`:
+  - `förbered` validerar, räknar Rule of Two, gör automatiska fynd och avgör relevanta OWASP-punkter
+  - `slutför` kräver bedömning av varje relevant punkt, vägrar om ett automatiskt fynd tagits bort eller en modell accepterat en risk, räknar utfallet, skriver `granskning.md` och för in utfallet i kontraktet
+- `schema/granskning.schema.json`.
+- Sju testfall med indatafiler och jämföraren `jamfor_facit.py`; kontrakten som fallen bygger på ligger i `tests/fixtures/granskning/`.
+- Provkörning 1 (självbedömd). Första körningen på System Insight: PR #240 och issues #241–#248 i `systeminsights`.
+- Källregistret: anmärkningen om OWASP uppdaterad.
+- Testerna laddar jämförarna via sökväg, eftersom båda skillsen har en modul som heter `jamfor_facit`.
+- `docs/arkitektur.md` version 3.
+
 ## 2026-11-21 · steg 2
 
 - Skillen `agent-kontrakt` i pluginet `agentbygge`: arbetsgång i elva steg, referenser om principer, sort och stack, fälten och System Insight, en mall och synkade kopior av `risk.py`, valideraren och schemat.

@@ -1,0 +1,91 @@
+schema_version: 1
+version: 1
+agare: Tommy
+skapad: '2026-11-21'
+datagrind:
+  ingen_arbetsinformation: true
+sakerhetsgranskning:
+  utfall: ej-gjord
+lage: av
+sfar: complexity-insight
+gdpr:
+  personuppgifter: false
+  kommentar: Organisationens material. Behandling av kunders personuppgifter regleras
+    i plattformens biträdesavtal (öppet beslut 9).
+stack:
+  val: system-insight-modul
+var_den_kors: system-insight
+identitet:
+  beskrivning: Modulens identitet per organisation (module_actor, MA-01). Modellnycklarna
+    läses bara av aiFetch.
+  nycklar: []
+avstangning:
+  nodstopp: Modulens brytare i registret, eller organisationens paus.
+  avveckling: Stäng av regeln i registret; modulen har inga egna nycklar.
+id: scout-sources
+namn: Spanaren
+behov:
+  beskrivning: Hitta nya källor och publikationer för organisationens bevakade ämnen,
+    med förslag på betyg och licens.
+syfte: Föreslår nya källor till källregistret med betyg och licensnivå; en admin godkänner.
+sort: ai-steg
+sort_motivering: Koden söker, hämtar och slår upp licenser; modellen bedömer kandidaterna
+  i ett anrop med påtvingat verktygsval. Ingen slinga där modellen väljer nästa steg.
+utlosare:
+  typ: schema
+  beskrivning: Tisdagar.
+laser:
+- resurs: Sökträffar från GDELT, startsidor och flöden
+  beskrivning: Titlar, adresser och sidtext från okända domäner.
+  opalitlig: true
+  kanslig: false
+- resurs: org_active_topics, observations.location_reference
+  beskrivning: Organisationens bevakade ämnen och adresser i egna observationer.
+  opalitlig: false
+  kanslig: true
+- resurs: licence_terms
+  beskrivning: Bedömda licensvillkor.
+  opalitlig: false
+  kanslig: false
+skriver:
+- resurs: external_sources (förslag)
+  beskrivning: Föreslagna källor med betyg och licensnivå.
+  effekt: forslag
+  godkannande: ingen
+- resurs: automation_runs
+  beskrivning: Körloggen.
+  effekt: rad
+  godkannande: ingen
+  styrs_av_modellen: false
+  kodstyrning: Koden skriver körningens fasta fält.
+kommunicerar_externt:
+- mottagare: GDELT
+  beskrivning: Sökfråga byggd av organisationens ämnen.
+  godkannande: ingen
+  styrs_av_modellen: false
+  kodstyrning: Koden bygger frågan ur ämnena (gdeltCombinedQuery) innan modellen anropas.
+- mottagare: Domänerna i sökträffarna
+  beskrivning: Hämtning av startsida och flöde.
+  godkannande: ingen
+  styrs_av_modellen: false
+  kodstyrning: Koden hämtar domänerna ur GDELT:s svar före modellanropet, med skydd
+    mot interna adresser.
+riskniva: 2
+modell:
+  leverantor: Lovables gateway
+  modell: rutten suggest
+  region: USA och EU (beslut 6)
+konsekvens: mansklig
+budget:
+  max_kostnad_kr_per_manad: 3
+  max_steg_per_korning: 1
+provsamling:
+  sokvag: src/lib/eval/sets/ (saknas för scout_sources)
+  antal_fall: 0
+  injektionsfall: false
+  matt: 'I drift: andel godkända förslag (module_measures scout_sources).'
+kallor:
+- meta-rule-of-two
+- anthropic-building-effective-agents
+anteckningar: I dag i registret; läget i drift kontrolleras i Bakom scenerna. Kontraktet
+  står i läget av tills säkerhetsgranskningen är gjord.

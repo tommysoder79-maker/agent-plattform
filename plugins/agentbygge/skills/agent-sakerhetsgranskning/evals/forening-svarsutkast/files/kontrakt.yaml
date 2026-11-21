@@ -1,0 +1,82 @@
+schema_version: 1
+version: 1
+agare: Tommy
+skapad: '2026-11-21'
+datagrind:
+  ingen_arbetsinformation: true
+sakerhetsgranskning:
+  utfall: ej-gjord
+lage: av
+id: forening-svarsutkast
+namn: Svarsutkast för föreningens info-adress
+sfar: forening
+behov:
+  beskrivning: Svara snabbt på vanliga frågor till föreningens info-adress, även om
+    avgiften är betald.
+syfte: Läser nya mejl till info-adressen och skriver svarsutkast, med betalstatus
+  ur medlemsregistret, som skickas först när någon godkänt dem.
+sort: ai-steg
+sort_motivering: Frågorna är fritext och varierar; ett modellsteg skriver utkastet
+  i ett fast flöde.
+utlosare:
+  typ: schema
+  beskrivning: Några gånger om dagen.
+laser:
+- resurs: Nya mejl till info-adressen
+  beskrivning: Avsändare och text.
+  opalitlig: true
+  kanslig: true
+- resurs: Medlemsregistret, bara betalstatus för avsändaren
+  beskrivning: Om avsändarens avgift är betald.
+  opalitlig: false
+  kanslig: true
+- resurs: Föreningens vanliga frågor och mötesdatum
+  beskrivning: Öppen information.
+  opalitlig: false
+  kanslig: false
+skriver:
+- resurs: Utkastmappen
+  beskrivning: Svarsutkast.
+  effekt: forslag
+  godkannande: ingen
+kommunicerar_externt:
+- mottagare: Avsändaren
+  beskrivning: Svaret, när det godkänts.
+  godkannande: fore-varje-handling
+riskniva: 2
+gdpr:
+  personuppgifter: true
+  rattslig_grund: Föreningens administration av medlemskapet. Inte juridiskt prövat.
+  registrerade: Medlemmar och andra som skriver till info-adressen.
+  bitraden:
+  - Anthropic
+  - e-postleverantören
+stack:
+  val: claude-skill
+modell:
+  leverantor: Anthropic
+var_den_kors: claude-schemalagd-uppgift
+identitet:
+  beskrivning: Egen åtkomst till info-adressen och läsrätt till registrets betalstatus.
+  nycklar:
+  - namn: FORENING_INFO_EPOST
+    omfang: Läsa inkorgen och skriva utkast, inte skicka.
+    kortlivad: false
+    delad_med_annan_agent: false
+  - namn: FORENING_REGISTER_LAS
+    omfang: Läsa betalstatus.
+    kortlivad: false
+    delad_med_annan_agent: false
+konsekvens: mansklig
+budget:
+  max_kostnad_kr_per_manad: 0
+  max_steg_per_korning: 30
+avstangning:
+  nodstopp: Stoppa den schemalagda uppgiften.
+  avveckling: Återkalla båda nycklarna.
+provsamling:
+  sokvag: evals/
+  antal_fall: 10
+  injektionsfall: true
+kallor:
+- meta-rule-of-two

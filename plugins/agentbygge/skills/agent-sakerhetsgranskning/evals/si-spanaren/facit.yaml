@@ -1,0 +1,6 @@
+# Läses av jamfor_facit.py. Skrivs av skapa_fall.py.
+utfall: godkand
+hog: false
+automatiska:
+- Facit räcker inte
+- GDELT

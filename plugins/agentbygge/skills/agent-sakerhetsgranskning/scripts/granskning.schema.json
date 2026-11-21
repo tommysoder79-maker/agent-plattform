@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tommysoder79-maker/agent-plattform/schema/granskning.schema.json",
+  "title": "Säkerhetsgranskning av ett agentkontrakt",
+  "description": "Skrivs av scripts/granska.py förbered, fylls i av granskaren och slutförs av granska.py slutför, som räknar utfallet. Utfallet skrivs aldrig för hand.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kontrakt", "kontrakt_id", "kontrakt_version", "datum", "granskare", "underlag", "rule_of_two", "asi", "fynd"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "kontrakt": {"type": "string", "minLength": 1, "description": "Sökväg till kontraktet, relativ till granskningen."},
+    "kontrakt_id": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+    "kontrakt_version": {"type": "integer", "minimum": 1},
+    "datum": {"type": "string", "format": "date"},
+    "granskare": {"type": "string", "minLength": 1},
+    "underlag": {
+      "type": "array",
+      "description": "Det som lästes utöver kontraktet: kod, konfiguration, dokument. Med sökväg och gärna radnummer.",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "rule_of_two": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["abc", "niva", "skal"],
+      "properties": {
+        "abc": {"type": "string", "pattern": "^[A-][B-][C-]$"},
+        "niva": {"enum": [1, 2, 3]},
+        "skal": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "asi": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "titel", "relevant", "skal", "bedomning"],
+        "properties": {
+          "id": {"enum": ["ASI01", "ASI02", "ASI03", "ASI04", "ASI05", "ASI06", "ASI07", "ASI08", "ASI09", "ASI10"]},
+          "titel": {"type": "string"},
+          "relevant": {"type": "boolean"},
+          "skal": {"type": "string", "description": "Varför punkten är eller inte är relevant, enligt granska.py."},
+          "bedomning": {"type": "string", "description": "Granskarens bedömning. Krävs för relevanta punkter."},
+          "kontroller_som_finns": {"type": "array", "items": {"type": "string"}},
+          "fynd": {"type": "array", "items": {"type": "string", "pattern": "^[AF][0-9]+$"}}
+        }
+      }
+    },
+    "fynd": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "rubrik", "asi", "allvar", "beskrivning", "atgard", "kalla", "status"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[AF][0-9]+$", "description": "A = automatiskt fynd från granska.py, F = granskarens fynd."},
+          "nyckel": {"type": "string", "description": "Automatiska fynd: nyckeln som slutför använder för att se att fyndet finns kvar."},
+          "rubrik": {"type": "string", "minLength": 1},
+          "asi": {"type": "array", "items": {"enum": ["ASI01", "ASI02", "ASI03", "ASI04", "ASI05", "ASI06", "ASI07", "ASI08", "ASI09", "ASI10"]}},
+          "allvar": {"enum": ["hog", "medel", "lag"]},
+          "beskrivning": {"type": "string", "minLength": 1},
+          "atgard": {"type": "string", "minLength": 1},
+          "kalla": {"enum": ["automatisk", "bedomning"]},
+          "status": {"enum": ["oppen", "accepterad", "atgardad"]},
+          "accepterad_av": {"type": "string", "minLength": 1},
+          "accepterad_datum": {"type": "string", "format": "date"},
+          "omprovas": {"type": "string", "minLength": 1, "description": "När eller vid vilken händelse en accepterad risk prövas igen."},
+          "issue": {"type": "string", "description": "Länk eller nummer till ett issue."}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"const": "accepterad"}}, "required": ["status"]},
+            "then": {"required": ["accepterad_av", "accepterad_datum", "omprovas"]}
+          }
+        ]
+      }
+    },
+    "utfall": {"enum": ["godkand", "underkand"], "description": "Skrivs av granska.py slutför."},
+    "utfall_skal": {"type": "string", "description": "Skrivs av granska.py slutför."}
+  }
+}
