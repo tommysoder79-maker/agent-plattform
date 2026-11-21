@@ -1,4 +1,4 @@
-# Arkitektur för agentbygget (version 1, 2026-11-21)
+# Arkitektur för agentbygget (version 2, 2026-11-21)
 
 **Master.** Det här dokumentet är `claude/agent-arkitektur.md` i Claude-projektet "AI agenter". Spegeln ligger i repot som `docs/arkitektur.md`. Hur de hålls lika står i *Så hålls dokumentet aktuellt* längst ned.
 
@@ -47,7 +47,7 @@ Det finns ingen orkestrerande skill. Varje skill slutar med att peka på nästa 
 
 | Skill | Gör | Vilar på | Status |
 |---|---|---|---|
-| `agent-kontrakt` | Från behov till kontrakt: spårar behovet med `arkitektur-begreppsmodell`, väljer sort, räknar Rule of Two och risknivå med `scripts/risk.py`, väljer stack och skriver kontraktet. För System Insight blir resultatet en post i `contracts.ts` och ett skelett till ett eval-set. | `schema/agentkontrakt.schema.json`, `scripts/` | Steg 2 |
+| `agent-kontrakt` | Från behov till kontrakt: datagrinden, sfären, behovet (med `arkitektur-begreppsmodell`), sorten, resurserna, Rule of Two och risknivå med `scripts/risk.py`, uppdelning vid nivå 3, validering och leverans per sfär. För System Insight blir resultatet en post i `contracts.ts`, och avvikelser från posten redovisas som fynd. | `schema/agentkontrakt.schema.json`, `scripts/` | Byggd (steg 2) |
 | `agent-sakerhetsgranskning` | Deterministiska kontroller först (schema, datagrind, förbjudna kombinationer, hemligheter), sedan OWASP ASI01–ASI10 så långt risknivån kräver, identitet och behörighet, och leverantörskedjan för MCP-servrar och skills. På nivå 3 också `prova-mot-motstandare`. | OWASP, Meta, NCCoE | Steg 3 |
 | `agent-evals` | Facit ur verkliga fel, injektionsfall i varje fält som kommer utifrån, inspelade svar för regression och bedömning av utfall, inte väg. Mönstret kommer från System Insights `src/lib/eval`. | Anthropic, *Demystifying evals* | Steg 4 |
 | `agent-drift` | Registrering, start i skugga, kriterier för befordran, budget, nödstopp, månadsgranskning och avveckling med återkallade nycklar. | System Insights register | Steg 5 |
@@ -60,13 +60,18 @@ Kontraktet anger fakta per resurs, och koden räknar:
 
 - **A** om någon läst resurs har `opalitlig: true`.
 - **B** om någon läst resurs har `kanslig: true`.
-- **C** om någon skrivning med effekt `angringsbar` eller `oaterkallelig`, eller någon extern kommunikation, saknar `godkannande: fore-varje-handling`. Ett förslag som hamnar i en kö där en människa avgör räknas inte som C.
+- **C** om någon skrivning med effekt `angringsbar` eller `oaterkallelig`, eller någon extern kommunikation, saknar `godkannande: fore-varje-handling` och kan styras av modellen. Följande räknas inte som C:
+  - ett förslag (`forslag`) som hamnar i en kö där en människa avgör
+  - ett råd (`rad`) som bara läses av en människa
+  - en skrivning eller ett anrop som koden ensam bestämmer (`styrs_av_modellen: false`, med `kodstyrning` beskriven)
+
+  Rule of Two gäller det som en injicerad instruktion kan få modellen att göra.
 - **Risknivå** är antalet egenskaper, men lägst 1. Den deklarerade nivån måste vara lika med den räknade.
 
 `scripts/validera_kontrakt.py` kontrollerar också:
 - att oåterkalleliga handlingar har en grind
 - att konsekvensklassen inte är för låg
-- att provsamlingen räcker för nivån
+- att provsamlingen räcker för nivån när agenten är påslagen (i läget av är en brist en varning)
 - att säkerhetsgranskningen är godkänd innan en agent på nivå 2 går i skugga
 - att id och mapp stämmer
 - att källorna finns i källregistret
@@ -94,7 +99,7 @@ Exemplet är Yahoo-rensningen. I en enda session blir den nivå 3, eftersom mejl
 
 Tre loopar:
 
-1. **Vid varje ändring (GitHub Actions):** tester, validering av skills och marknadsplats, exempelkontrakt, källregistret, att spegeln av det här dokumentet har högre version och inte tappat avsnitt, och sökning efter hemligheter (gitleaks). `main` ska vara skyddad: pull request och gröna kontroller.
+1. **Vid varje ändring (GitHub Actions):** tester, validering av skills och marknadsplats, att skillsens kopior av skript och scheman är lika med originalen (`scripts/synka_skillskript.py --kontrollera`), exempelkontrakt, källregistret, att spegeln av det här dokumentet har högre version och inte tappat avsnitt, och sökning efter hemligheter (gitleaks). `main` ska vara skyddad: pull request och gröna kontroller.
 2. **Varje månad (schemalagd uppgift i Claude):**
    - Källregistret stäms av mot nivå 1-källorna.
    - Skillsens evals körs.
@@ -134,6 +139,12 @@ System Insights agenter stannar i plattformen och styrs av dess eget kontrakt, s
 - regeln för mastern
 - uppgiften om A2A
 
+Provkörningen av `agent-kontrakt` 2026-11-21 (`plugins/agentbygge/skills/agent-kontrakt/evals/provkorning-1.md`) gav ytterligare fynd till steg 3:
+- **Alla sex moduler är AI-steg.** Varje modul gör ett anrop med påtvingat verktygsval, men alla står som `agent` i `contracts.ts`.
+- **Fältet `consequence` används på två sätt.** Fyra moduler skriver förslag men står som `informational`, och Rödlaget skriver råd men står som `human`.
+- **Planeraren blir nivå 3 i automatiskt läge.**
+- **Spanaren skickar organisationens ämnen till GDELT.** Det är spridning av data, men inte C.
+
 Lovables undantag från grenskyddet är en accepterad risk som omprövas före första betalande kund, dock senast 2027-02-21.
 
 ## Byggordning
@@ -141,10 +152,10 @@ Lovables undantag från grenskyddet är en accepterad risk som omprövas före f
 | Steg | Innehåll | Status |
 |---|---|---|
 | 1 | Repona, schemat, validerarna, källregistret, CI och release | Klart 2026-11-21 |
-| 2 | `agent-kontrakt` med System Insights agenter och Yahoo-rensningen som facit | Nästa |
-| 3 | `agent-sakerhetsgranskning`, första körningen på System Insight | |
+| 2 | `agent-kontrakt`, med System Insights sex moduler och fyra påhittade fall som facit (nivå 3 som delas upp, motor, datagrinden, två sfärer) | Klart 2026-11-21 |
+| 3 | `agent-sakerhetsgranskning`, första körningen på System Insight | Nästa |
 | 4 | `agent-evals`, först facit för Rödlaget, Spanaren och Alternativbyggaren | |
-| 5 | `agent-drift`, med Yahoo-rensningen som pilot i två delar | |
+| 5 | `agent-drift`, med en pilot som väljs senare | |
 
 ## Öppna beslut
 
@@ -152,6 +163,8 @@ Lovables undantag från grenskyddet är en accepterad risk som omprövas före f
 2. **Läsnyckel för `agenter-privat`.** CI där behöver läsa `agent-plattform`. Det kräver en finkornig, skrivskyddad token som hemligheten `AGENT_PLATTFORM_LASA`. Utan den hoppar valideringen över med en varning.
 3. **Grenskydd** på båda repona: pull request och gröna kontroller.
 4. **Agent Skills-specen** ska läsas i original och stämmas av mot validatorn, som i dag följer Anthropics egen uppladdningskontroll.
+5. **Pilot för `agent-drift`.** Yahoo-rensningen är struken från steg 2. Två saker är öppna: vilken pilot steg 5 ska ha, och om exemplen i `schema/exempel/` ska bytas ut.
+6. **En oberoende körning av `agent-kontrakt`**, med `claude plugin eval` eller i månadsgranskningen, så att skillen inte bara är prövad av den session som skrev den.
 
 ## Så hålls dokumentet aktuellt
 
@@ -163,4 +176,5 @@ Lovables undantag från grenskyddet är en accepterad risk som omprövas före f
 
 ## Ändringslogg
 
+- Version 2 (2026-11-21): steg 2 klart. `agent-kontrakt` är byggd, med tio testfall, en jämförare och provkörning 1. Kontraktet har fått effekten `rad` och `styrs_av_modellen` med `kodstyrning`. Provsamlingens krav gäller när agenten är påslagen. Fynden om System Insight har lagts till, Yahoo-rensningen är struken som facit och pilot, och de öppna besluten 5 och 6 är nya.
 - Version 1 (2026-11-21): första versionen. Principer, placering, byggkedjan, kontraktet, risknivåer, säkerhetskärnan, kvalitet över tid, release, källor, System Insight, byggordning och öppna beslut. Steg 1 klart.

@@ -1,0 +1,11 @@
+# Läses av jamfor_facit.py. Skrivs av skapa_fall.py.
+stoppar: false
+antal_kontrakt:
+- 2
+alla:
+  validerar: true
+  riskniva_hogst: 2
+sfarer:
+- forening
+- privat
+kontrakt: []

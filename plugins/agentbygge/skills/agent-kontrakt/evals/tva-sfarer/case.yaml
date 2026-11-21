@@ -1,0 +1,4 @@
+schema_version: '1.1'
+name: tva-sfarer
+expected_outcome: |
+  Två kontrakt, ett i sfären forening och ett i sfären privat, eftersom en agent inte får spänna över två sfärer. Ingen del på nivå 3.

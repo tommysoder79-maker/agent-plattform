@@ -1,0 +1,4 @@
+schema_version: '1.1'
+name: si-rodlaget
+expected_outcome: |
+  Ett kontrakt med sorten ai-steg, A och B (nivå 2). Fynden skrivs som råd, så den lägsta konsekvensen är informativ; den strängare klassen human är tillåten. Sammanfattningen nämner att sorten avviker.

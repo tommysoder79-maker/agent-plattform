@@ -9,7 +9,8 @@ Kontrollerna, i ordning:
      före varje handling.
   4. Konsekvensklassen får inte vara lägre än vad skrivningarna kräver.
   5. Provsamlingen efter nivå: nivå 1 minst 5 fall, nivå 2 minst 10 fall och
-     injektionsfall. Opålitlig indata (A) kräver alltid injektionsfall.
+     injektionsfall. Opålitlig indata (A) kräver alltid injektionsfall. Kravet
+     gäller när läget är skugga eller automatiskt; i läget av blir en brist en varning.
   6. Säkerhetsgranskningen: underkänd får inte vara påslagen; nivå 2 kräver
      godkänd granskning innan läget är skugga eller automatiskt.
   7. Id och mapp: kontrakt.yaml ligger i en mapp med samma namn som id.
@@ -38,9 +39,20 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from risk import KONSEKVENS_ORDNING, lagsta_konsekvens, rakna
 
-ROT = Path(__file__).resolve().parent.parent
-KONTRAKTSCHEMA = ROT / "schema" / "agentkontrakt.schema.json"
-REGISTERSCHEMA = ROT / "schema" / "agentregister.schema.json"
+HAR = Path(__file__).resolve().parent
+ROT = HAR.parent
+
+
+def _schemafil(namn: str) -> Path:
+    """Repots schema/ i första hand; i en uppladdad skill ligger schemat bredvid skriptet."""
+    for p in (ROT / "schema" / namn, HAR / namn):
+        if p.is_file():
+            return p
+    return ROT / "schema" / namn
+
+
+KONTRAKTSCHEMA = _schemafil("agentkontrakt.schema.json")
+REGISTERSCHEMA = _schemafil("agentregister.schema.json")
 
 MIN_FALL = {1: 5, 2: 10}
 
@@ -102,17 +114,19 @@ def regelfel(k: dict[str, Any], sokvag: Path, kontrollera_sokvagar: bool) -> tup
     if dekl in KONSEKVENS_ORDNING and KONSEKVENS_ORDNING[dekl] < KONSEKVENS_ORDNING[lagst]:
         fel.append(f"konsekvens: '{dekl}' är lägre än vad skrivningarna kräver ('{lagst}')")
 
-    # 5. Provsamlingen
+    # 5. Provsamlingen. Kravet gäller när agenten är påslagen; i läget av är en brist en varning,
+    #    så att ett kontrakt kan beskriva en agent som saknar facit utan att låtsas något annat.
+    lage = k.get("lage")
+    prov_brist = fel if lage != "av" else varn
     prov = k.get("provsamling") or {}
     min_fall = MIN_FALL.get(r.niva)
     if min_fall is not None and isinstance(prov.get("antal_fall"), int) and prov["antal_fall"] < min_fall:
-        fel.append(f"provsamling: nivå {r.niva} kräver minst {min_fall} fall, kontraktet har {prov['antal_fall']}")
+        prov_brist.append(f"provsamling: nivå {r.niva} kräver minst {min_fall} fall, kontraktet har {prov['antal_fall']}")
     if (r.a or r.niva >= 2) and prov.get("injektionsfall") is not True:
-        fel.append("provsamling: opålitlig indata eller nivå 2 kräver injektionsfall")
+        prov_brist.append("provsamling: opålitlig indata eller nivå 2 kräver injektionsfall")
 
     # 6. Säkerhetsgranskningen
     gr = (k.get("sakerhetsgranskning") or {}).get("utfall")
-    lage = k.get("lage")
     if gr == "underkand" and lage != "av":
         fel.append("sakerhetsgranskning: underkänd granskning, men läget är inte av")
     if r.niva >= 2 and lage in ("skugga", "automatiskt") and gr != "godkand":

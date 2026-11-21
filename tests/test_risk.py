@@ -29,6 +29,12 @@ def skriv(effekt, godkannande="ingen", resurs="w"):
         # Extern kommunikation utan godkännande ger C.
         (kontrakt([las(True, True)], [], [{"mottagare": "x", "godkannande": "ingen"}]), (True, True, True), 3),
         (kontrakt([las(True, True)], [], [{"mottagare": "x", "godkannande": "fore-varje-handling"}]), (True, True, False), 2),
+        # Råd som bara läses av en människa ger inte C.
+        (kontrakt([las(True, True)], [skriv("rad")]), (True, True, False), 2),
+        # Det koden ensam bestämmer ger inte C; det modellen kan styra gör det.
+        (kontrakt([las(True, True)], [dict(skriv("angringsbar"), styrs_av_modellen=False)]), (True, True, False), 2),
+        (kontrakt([las(True, True)], [], [{"mottagare": "x", "godkannande": "ingen", "styrs_av_modellen": False}]), (True, True, False), 2),
+        (kontrakt([las(True, True)], [dict(skriv("angringsbar"), styrs_av_modellen=True)]), (True, True, True), 3),
     ],
 )
 def test_rule_of_two(k, abc, niva):
@@ -47,6 +53,7 @@ def test_skalen_namnger_resurserna():
     "k, lagst",
     [
         (kontrakt([las()]), "informativ"),
+        (kontrakt([las()], [skriv("rad")]), "informativ"),
         (kontrakt([las()], [skriv("angringsbar")]), "angringsbar"),
         (kontrakt([las()], [skriv("forslag")]), "mansklig"),
         (kontrakt([las()], [skriv("oaterkallelig", "fore-varje-handling")]), "mansklig"),

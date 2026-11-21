@@ -30,6 +30,9 @@ jobs:
       - name: Skills och marknadsplats
         run: python scripts/validera_skills.py
 
+      - name: Skriptkopior i skills
+        run: python scripts/synka_skillskript.py --kontrollera
+
       - name: Exempelkontrakt
         run: python scripts/validera_kontrakt.py --kallregister kallregister/kallor.yaml schema/exempel/*.yaml
 

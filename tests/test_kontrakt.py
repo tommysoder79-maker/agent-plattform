@@ -58,6 +58,15 @@ def test_oaterkallelig_med_godkannande_godtas(utfor):
     assert alla_fel(utfor) == []
 
 
+def test_kodstyrd_skrivning_kraver_beskrivning(utfor):
+    utfor["skriver"][0]["styrs_av_modellen"] = False
+    assert any("kodstyrning" in f for f in alla_fel(utfor))
+    utfor["skriver"][0]["kodstyrning"] = "Koden flyttar exakt de id som står på den godkända listan."
+    utfor["riskniva"] = 1
+    utfor["provsamling"]["antal_fall"] = 5
+    assert alla_fel(utfor) == []
+
+
 def test_datagrinden_kan_inte_stangas_av(las):
     las["datagrind"]["ingen_arbetsinformation"] = False
     assert any("datagrind" in f for f in alla_fel(las))
@@ -69,14 +78,28 @@ def test_automatiskt_kraver_befordran(las):
     assert any("befordran" in f for f in alla_fel(las))
 
 
+def _paslagen(k):
+    k["lage"] = "skugga"
+    k["sakerhetsgranskning"] = {"utfall": "godkand", "datum": "2026-11-21"}
+    return k
+
+
 def test_niva_2_kraver_tio_fall(las):
     las["provsamling"]["antal_fall"] = 9
-    assert any("minst 10 fall" in f for f in alla_fel(las))
+    assert any("minst 10 fall" in f for f in alla_fel(_paslagen(las)))
 
 
 def test_opalitlig_indata_kraver_injektionsfall(las):
     las["provsamling"]["injektionsfall"] = False
-    assert any("injektionsfall" in f for f in alla_fel(las))
+    assert any("injektionsfall" in f for f in alla_fel(_paslagen(las)))
+
+
+def test_saknad_provsamling_ar_varning_i_laget_av(las):
+    las["provsamling"]["antal_fall"] = 0
+    las["provsamling"]["injektionsfall"] = False
+    assert alla_fel(las) == []
+    _, varn = regelfel(las, P, kontrollera_sokvagar=False)
+    assert any("minst 10 fall" in v for v in varn) and any("injektionsfall" in v for v in varn)
 
 
 def test_niva_2_i_skugga_kraver_godkand_granskning(las):

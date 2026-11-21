@@ -6,44 +6,102 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "id", "namn", "version", "sfar", "agare", "skapad",
-    "behov", "syfte", "sort", "utlosare", "laser", "skriver", "kommunicerar_externt",
-    "riskniva", "datagrind", "gdpr", "stack", "modell", "var_den_kors",
-    "identitet", "konsekvens", "lage", "budget", "avstangning", "provsamling",
+    "schema_version",
+    "id",
+    "namn",
+    "version",
+    "sfar",
+    "agare",
+    "skapad",
+    "behov",
+    "syfte",
+    "sort",
+    "utlosare",
+    "laser",
+    "skriver",
+    "kommunicerar_externt",
+    "riskniva",
+    "datagrind",
+    "gdpr",
+    "stack",
+    "modell",
+    "var_den_kors",
+    "identitet",
+    "konsekvens",
+    "lage",
+    "budget",
+    "avstangning",
+    "provsamling",
     "sakerhetsgranskning"
   ],
   "properties": {
-    "schema_version": { "const": 1 },
+    "schema_version": {
+      "const": 1
+    },
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
       "maxLength": 64,
       "description": "Unikt id i kebab-case. Samma som mappnamnet under agents/."
     },
-    "namn": { "type": "string", "minLength": 1, "maxLength": 120 },
-    "version": { "type": "integer", "minimum": 1 },
+    "namn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
     "sfar": {
-      "enum": ["privat", "forening", "complexity-insight"],
+      "enum": [
+        "privat",
+        "forening",
+        "complexity-insight"
+      ],
       "description": "Vilken sfär agenten tillhör. En agent spänner aldrig över två sfärer."
     },
-    "agare": { "type": "string", "minLength": 1 },
-    "skapad": { "type": "string", "format": "date" },
-    "senast_granskad": { "type": "string", "format": "date" },
+    "agare": {
+      "type": "string",
+      "minLength": 1
+    },
+    "skapad": {
+      "type": "string",
+      "format": "date"
+    },
+    "senast_granskad": {
+      "type": "string",
+      "format": "date"
+    },
     "behov": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["beskrivning"],
+      "required": [
+        "beskrivning"
+      ],
       "properties": {
-        "beskrivning": { "type": "string", "minLength": 1 },
+        "beskrivning": {
+          "type": "string",
+          "minLength": 1
+        },
         "sparning": {
           "type": "string",
           "description": "Var behovet eller kravet fångas, till exempel NAF-nivå och vy (C, S, L, P). Se skillen arkitektur-begreppsmodell."
         }
       }
     },
-    "syfte": { "type": "string", "minLength": 1, "maxLength": 300, "description": "En mening." },
+    "syfte": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300,
+      "description": "En mening."
+    },
     "sort": {
-      "enum": ["motor", "ai-steg", "agent"],
+      "enum": [
+        "motor",
+        "ai-steg",
+        "agent"
+      ],
       "description": "motor = kod utan modell; ai-steg = fast arbetsflöde med ett modellsteg; agent = planerar egna steg, bara där vägen inte kan bestämmas i förväg."
     },
     "sort_motivering": {
@@ -54,10 +112,22 @@
     "utlosare": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["typ", "beskrivning"],
+      "required": [
+        "typ",
+        "beskrivning"
+      ],
       "properties": {
-        "typ": { "enum": ["schema", "handelse", "pa-begaran"] },
-        "beskrivning": { "type": "string", "minLength": 1 }
+        "typ": {
+          "enum": [
+            "schema",
+            "handelse",
+            "pa-begaran"
+          ]
+        },
+        "beskrivning": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "laser": {
@@ -66,10 +136,21 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["resurs", "beskrivning", "opalitlig", "kanslig"],
+        "required": [
+          "resurs",
+          "beskrivning",
+          "opalitlig",
+          "kanslig"
+        ],
         "properties": {
-          "resurs": { "type": "string", "minLength": 1 },
-          "beskrivning": { "type": "string", "minLength": 1 },
+          "resurs": {
+            "type": "string",
+            "minLength": 1
+          },
+          "beskrivning": {
+            "type": "string",
+            "minLength": 1
+          },
           "opalitlig": {
             "type": "boolean",
             "description": "Kan innehållet styras av någon annan än ägaren (webben, mejl från andra, dokument utifrån)? Ger Rule of Two A."
@@ -86,19 +167,66 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["resurs", "beskrivning", "effekt", "godkannande"],
+        "required": [
+          "resurs",
+          "beskrivning",
+          "effekt",
+          "godkannande"
+        ],
         "properties": {
-          "resurs": { "type": "string", "minLength": 1 },
-          "beskrivning": { "type": "string", "minLength": 1 },
+          "resurs": {
+            "type": "string",
+            "minLength": 1
+          },
+          "beskrivning": {
+            "type": "string",
+            "minLength": 1
+          },
           "effekt": {
-            "enum": ["forslag", "angringsbar", "oaterkallelig"],
-            "description": "forslag = hamnar i en kö som en människa avgör; angringsbar = ändrar tillstånd men kan ångras; oaterkallelig = kan inte ångras."
+            "enum": [
+              "rad",
+              "forslag",
+              "angringsbar",
+              "oaterkallelig"
+            ],
+            "description": "rad = text som bara läses av en människa och inte ändrar något annat (förklaring, råd, svar, logg); forslag = hamnar i en kö som en människa avgör; angringsbar = ändrar tillstånd men kan ångras; oaterkallelig = kan inte ångras."
           },
           "godkannande": {
-            "enum": ["ingen", "fore-varje-handling"],
+            "enum": [
+              "ingen",
+              "fore-varje-handling"
+            ],
             "description": "fore-varje-handling = en människa godkänner varje enskild handling med rådata framför sig."
+          },
+          "styrs_av_modellen": {
+            "type": "boolean",
+            "description": "Kan modellens svar påverka om, var eller vad som skrivs eller skickas? Standard true. Sätt false bara när koden ensam bestämmer mål och innehåll, och beskriv hur i kodstyrning."
+          },
+          "kodstyrning": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Hur koden, inte modellen, bestämmer mål och innehåll. Krävs när styrs_av_modellen är false."
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "styrs_av_modellen": {
+                  "const": false
+                }
+              },
+              "required": [
+                "styrs_av_modellen"
+              ]
+            },
+            "then": {
+              "required": [
+                "kodstyrning"
+              ]
+            }
+          }
+        ]
       }
     },
     "kommunicerar_externt": {
@@ -106,179 +234,438 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["mottagare", "beskrivning", "godkannande"],
+        "required": [
+          "mottagare",
+          "beskrivning",
+          "godkannande"
+        ],
         "properties": {
-          "mottagare": { "type": "string", "minLength": 1 },
-          "beskrivning": { "type": "string", "minLength": 1 },
-          "godkannande": { "enum": ["ingen", "fore-varje-handling"] }
-        }
+          "mottagare": {
+            "type": "string",
+            "minLength": 1
+          },
+          "beskrivning": {
+            "type": "string",
+            "minLength": 1
+          },
+          "godkannande": {
+            "enum": [
+              "ingen",
+              "fore-varje-handling"
+            ]
+          },
+          "styrs_av_modellen": {
+            "type": "boolean",
+            "description": "Kan modellens svar påverka om, var eller vad som skrivs eller skickas? Standard true. Sätt false bara när koden ensam bestämmer mål och innehåll, och beskriv hur i kodstyrning."
+          },
+          "kodstyrning": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Hur koden, inte modellen, bestämmer mål och innehåll. Krävs när styrs_av_modellen är false."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "styrs_av_modellen": {
+                  "const": false
+                }
+              },
+              "required": [
+                "styrs_av_modellen"
+              ]
+            },
+            "then": {
+              "required": [
+                "kodstyrning"
+              ]
+            }
+          }
+        ]
       }
     },
     "riskniva": {
-      "enum": [1, 2, 3],
+      "enum": [
+        1,
+        2,
+        3
+      ],
       "description": "Deklarerad nivå. Måste vara lika med den som scripts/risk.py räknar. Nivå 3 godtas aldrig."
     },
     "uppdelning": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["beskrivning", "delar"],
+      "required": [
+        "beskrivning",
+        "delar"
+      ],
       "description": "Används när ett flöde delats upp för att undvika nivå 3. Pekar på de andra kontrakten i samma flöde.",
       "properties": {
-        "beskrivning": { "type": "string", "minLength": 1 },
+        "beskrivning": {
+          "type": "string",
+          "minLength": 1
+        },
         "delar": {
           "type": "array",
           "minItems": 2,
-          "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          }
         }
       }
     },
     "datagrind": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ingen_arbetsinformation"],
+      "required": [
+        "ingen_arbetsinformation"
+      ],
       "properties": {
         "ingen_arbetsinformation": {
           "const": true,
           "description": "Ingen information från arbetet, och inget säkerhetsskyddsklassificerat, får någonsin komma in i agenten."
         },
-        "kommentar": { "type": "string" }
+        "kommentar": {
+          "type": "string"
+        }
       }
     },
     "gdpr": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["personuppgifter"],
+      "required": [
+        "personuppgifter"
+      ],
       "properties": {
-        "personuppgifter": { "type": "boolean" },
-        "rattslig_grund": { "type": "string", "minLength": 1 },
-        "registrerade": { "type": "string", "description": "Vilkas uppgifter behandlas." },
-        "bitraden": { "type": "array", "items": { "type": "string" } },
-        "kommentar": { "type": "string" }
+        "personuppgifter": {
+          "type": "boolean"
+        },
+        "rattslig_grund": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registrerade": {
+          "type": "string",
+          "description": "Vilkas uppgifter behandlas."
+        },
+        "bitraden": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kommentar": {
+          "type": "string"
+        }
       }
     },
     "stack": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["val"],
+      "required": [
+        "val"
+      ],
       "properties": {
-        "val": { "enum": ["claude-agent-sdk", "claude-skill", "langgraph", "system-insight-modul", "annan"] },
-        "motivering": { "type": "string", "minLength": 1 }
+        "val": {
+          "enum": [
+            "claude-agent-sdk",
+            "claude-skill",
+            "langgraph",
+            "system-insight-modul",
+            "annan"
+          ]
+        },
+        "motivering": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "modell": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["leverantor"],
+      "required": [
+        "leverantor"
+      ],
       "properties": {
-        "leverantor": { "type": "string", "minLength": 1 },
-        "modell": { "type": "string" },
-        "region": { "type": "string" }
+        "leverantor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modell": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        }
       }
     },
     "var_den_kors": {
-      "enum": ["claude-schemalagd-uppgift", "claude-chatt", "claude-code-lokalt", "system-insight", "github-actions", "annan"]
+      "enum": [
+        "claude-schemalagd-uppgift",
+        "claude-chatt",
+        "claude-code-lokalt",
+        "system-insight",
+        "github-actions",
+        "annan"
+      ]
     },
     "identitet": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["beskrivning", "nycklar"],
+      "required": [
+        "beskrivning",
+        "nycklar"
+      ],
       "properties": {
-        "beskrivning": { "type": "string", "minLength": 1 },
+        "beskrivning": {
+          "type": "string",
+          "minLength": 1
+        },
         "nycklar": {
           "type": "array",
           "description": "Namn och omfång, aldrig värden. Varje agent har egna nycklar.",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["namn", "omfang", "delad_med_annan_agent"],
+            "required": [
+              "namn",
+              "omfang",
+              "delad_med_annan_agent"
+            ],
             "properties": {
-              "namn": { "type": "string", "minLength": 1 },
-              "omfang": { "type": "string", "minLength": 1 },
-              "kortlivad": { "type": "boolean" },
-              "delad_med_annan_agent": { "const": false }
+              "namn": {
+                "type": "string",
+                "minLength": 1
+              },
+              "omfang": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kortlivad": {
+                "type": "boolean"
+              },
+              "delad_med_annan_agent": {
+                "const": false
+              }
             }
           }
         }
       }
     },
     "konsekvens": {
-      "enum": ["informativ", "angringsbar", "mansklig"],
+      "enum": [
+        "informativ",
+        "angringsbar",
+        "mansklig"
+      ],
       "description": "System Insights grind: informativ, ångringsbar eller väntar på människa."
     },
-    "lage": { "enum": ["av", "skugga", "automatiskt"] },
+    "lage": {
+      "enum": [
+        "av",
+        "skugga",
+        "automatiskt"
+      ]
+    },
     "befordran": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["datum", "underlag"],
+      "required": [
+        "datum",
+        "underlag"
+      ],
       "description": "Krävs när lage är automatiskt: när och på vilket underlag agenten lämnade skuggan.",
       "properties": {
-        "datum": { "type": "string", "format": "date" },
-        "underlag": { "type": "string", "minLength": 1 }
+        "datum": {
+          "type": "string",
+          "format": "date"
+        },
+        "underlag": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "budget": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["max_kostnad_kr_per_manad", "max_steg_per_korning"],
+      "required": [
+        "max_kostnad_kr_per_manad",
+        "max_steg_per_korning"
+      ],
       "properties": {
-        "max_kostnad_kr_per_manad": { "type": "number", "minimum": 0 },
-        "max_steg_per_korning": { "type": "integer", "minimum": 1 },
-        "max_korningar_per_dag": { "type": "integer", "minimum": 1 }
+        "max_kostnad_kr_per_manad": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_steg_per_korning": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_korningar_per_dag": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "avstangning": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["nodstopp"],
+      "required": [
+        "nodstopp"
+      ],
       "properties": {
-        "nodstopp": { "type": "string", "minLength": 1, "description": "Hur agenten stoppas direkt." },
-        "avveckling": { "type": "string", "description": "Hur nycklar återkallas när agenten avvecklas." }
+        "nodstopp": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Hur agenten stoppas direkt."
+        },
+        "avveckling": {
+          "type": "string",
+          "description": "Hur nycklar återkallas när agenten avvecklas."
+        }
       }
     },
     "provsamling": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["sokvag", "antal_fall", "injektionsfall"],
+      "required": [
+        "sokvag",
+        "antal_fall",
+        "injektionsfall"
+      ],
       "properties": {
-        "sokvag": { "type": "string", "minLength": 1 },
-        "antal_fall": { "type": "integer", "minimum": 0 },
-        "injektionsfall": { "type": "boolean" },
-        "matt": { "type": "string" }
+        "sokvag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "antal_fall": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "injektionsfall": {
+          "type": "boolean"
+        },
+        "matt": {
+          "type": "string"
+        }
       }
     },
     "sakerhetsgranskning": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["utfall"],
+      "required": [
+        "utfall"
+      ],
       "properties": {
-        "utfall": { "enum": ["ej-gjord", "godkand", "underkand"] },
-        "datum": { "type": "string", "format": "date" },
-        "sokvag": { "type": "string" }
+        "utfall": {
+          "enum": [
+            "ej-gjord",
+            "godkand",
+            "underkand"
+          ]
+        },
+        "datum": {
+          "type": "string",
+          "format": "date"
+        },
+        "sokvag": {
+          "type": "string"
+        }
       }
     },
     "kallor": {
       "type": "array",
       "description": "Id:n i kallregister/kallor.yaml som kontraktets val vilar på.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "anteckningar": { "type": "string" }
+    "anteckningar": {
+      "type": "string"
+    }
   },
   "allOf": [
     {
-      "if": { "properties": { "sort": { "enum": ["ai-steg", "agent"] } } },
-      "then": { "required": ["sort_motivering"] }
+      "if": {
+        "properties": {
+          "sort": {
+            "enum": [
+              "ai-steg",
+              "agent"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "sort_motivering"
+        ]
+      }
     },
     {
-      "if": { "properties": { "lage": { "const": "automatiskt" } } },
-      "then": { "required": ["befordran"] }
+      "if": {
+        "properties": {
+          "lage": {
+            "const": "automatiskt"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "befordran"
+        ]
+      }
     },
     {
-      "if": { "properties": { "gdpr": { "properties": { "personuppgifter": { "const": true } } } } },
-      "then": { "properties": { "gdpr": { "required": ["personuppgifter", "rattslig_grund", "registrerade"] } } }
+      "if": {
+        "properties": {
+          "gdpr": {
+            "properties": {
+              "personuppgifter": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gdpr": {
+            "required": [
+              "personuppgifter",
+              "rattslig_grund",
+              "registrerade"
+            ]
+          }
+        }
+      }
     },
     {
-      "if": { "properties": { "stack": { "properties": { "val": { "const": "annan" } } } } },
-      "then": { "properties": { "stack": { "required": ["val", "motivering"] } } }
+      "if": {
+        "properties": {
+          "stack": {
+            "properties": {
+              "val": {
+                "const": "annan"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "stack": {
+            "required": [
+              "val",
+              "motivering"
+            ]
+          }
+        }
+      }
     }
   ]
 }
