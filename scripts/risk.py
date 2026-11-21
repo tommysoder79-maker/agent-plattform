@@ -10,9 +10,14 @@ måste stämma med det som räknas här.
   B  har åtkomst till känslig data   någon läst resurs har kanslig: true
   C  ändrar tillstånd eller          någon skrivning med effekt angringsbar eller
      kommunicerar externt            oaterkallelig, eller någon extern kommunikation,
-                                     som inte kräver godkännande före varje handling
+                                     som modellen kan styra och som inte kräver
+                                     godkännande före varje handling
 
-Ett förslag som hamnar i en kö där en människa avgör räknas inte som C.
+Ett förslag som hamnar i en kö där en människa avgör, och ett råd som bara
+läses av en människa, räknas inte som C. En skrivning eller ett anrop som
+koden ensam bestämmer (styrs_av_modellen: false, med kodstyrning beskriven)
+räknas inte heller: Rule of Two gäller det en injicerad instruktion kan få
+modellen att göra.
 
 Nivå = antalet egenskaper, men lägst 1. Nivå 3 godtas aldrig: flödet ska
 delas upp eller få mänskligt godkännande före varje handling.
@@ -68,9 +73,15 @@ def rakna(kontrakt: Mapping[str, Any]) -> RuleOfTwo:
     c_skriv = [
         s.get("resurs", "?")
         for s in skriver
-        if s.get("effekt") in TILLSTANDSANDRING and s.get("godkannande") != GODKANNANDE_FORE
+        if s.get("effekt") in TILLSTANDSANDRING
+        and s.get("godkannande") != GODKANNANDE_FORE
+        and s.get("styrs_av_modellen", True) is not False
     ]
-    c_komm = [k.get("mottagare", "?") for k in kommunicerar if k.get("godkannande") != GODKANNANDE_FORE]
+    c_komm = [
+        k.get("mottagare", "?")
+        for k in kommunicerar
+        if k.get("godkannande") != GODKANNANDE_FORE and k.get("styrs_av_modellen", True) is not False
+    ]
 
     if a_resurser:
         skal.append("A: opålitlig indata från " + ", ".join(a_resurser))
@@ -89,7 +100,7 @@ def lagsta_konsekvens(kontrakt: Mapping[str, Any]) -> str:
 
     Ett förslag eller en oåterkallelig handling väntar alltid på en människa
     (System Insights princip: grind efter konsekvens). En ångringsbar ändring
-    är ångringsbar. Annars är agenten informativ.
+    är ångringsbar. Råd och svar som bara läses är informativa.
     """
     skriver = kontrakt.get("skriver") or []
     kommunicerar = kontrakt.get("kommunicerar_externt") or []

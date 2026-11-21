@@ -9,6 +9,8 @@
   - en SKILL.md
   - SKILL.md hålls kort, med stabil kunskap i `references/`, skript i `scripts/`, mallar i `assets/` och skillens egna testfall i `evals/`
   - instabila uppgifter (versioner, API:er) slås upp när skillen körs och märks med ett verifieringsdatum
+  - en skill som behöver repots skript eller scheman bär kopior i sin `scripts/`; originalen ändras i `scripts/` och `schema/`, och `python scripts/synka_skillskript.py` kopierar dem (CI kontrollerar att de är lika)
+  - testfallen ligger i `evals/<fall>/` i det format `claude plugin eval` läser
 - **Källor:** ett val som vilar på en källa står i `kallregister/kallor.yaml`. En källa på nivå 3, läst i andra hand eller inte läst får inte bära ett beslut.
 - **Ändringar** görs i en gren och som pull request. CI ska vara grön, och Tommy slår ihop. Inga hemligheter i repot; nycklars namn och omfång står i kontrakt, aldrig deras värden.
 - **Masterdokumentet:** `docs/arkitektur.md` speglar `claude/agent-arkitektur.md` i Claude-projektet "AI agenter":
@@ -24,6 +26,7 @@ Kör allt som CI kör:
 pip install -r requirements.txt
 python -m pytest -q
 python scripts/validera_skills.py
+python scripts/synka_skillskript.py --kontrollera
 python scripts/validera_kontrakt.py --kallregister kallregister/kallor.yaml schema/exempel/*.yaml
 python scripts/kontrollera_kallor.py kallregister/kallor.yaml
 python scripts/kontrollera_spegel.py docs/arkitektur.md

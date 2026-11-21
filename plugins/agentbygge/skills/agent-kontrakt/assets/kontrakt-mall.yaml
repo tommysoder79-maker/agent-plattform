@@ -1,0 +1,85 @@
+# Mall för ett agentkontrakt. Schemat finns i scripts/agentkontrakt.schema.json.
+# Fyll i fakta; risknivån räknas av scripts/risk.py. Ta bort kommentarerna när du är klar.
+schema_version: 1
+id: kort-namn-i-kebab-case          # samma som mappen agents/<id>/
+namn: "Läsbart namn"
+version: 1
+sfar: privat                        # privat | forening | complexity-insight
+agare: Tommy
+skapad: 2026-01-01
+
+behov:
+  beskrivning: "Vad som behövs, utan lösning."
+  # sparning: "NAF C2, förmåga X"   # valfritt, med arkitektur-begreppsmodell
+
+syfte: "En mening om vad agenten gör."
+sort: ai-steg                       # motor | ai-steg | agent; den lägsta som räcker
+sort_motivering: "Varför en lägre sort inte räcker."   # krävs för ai-steg och agent
+
+utlosare:
+  typ: pa-begaran                   # schema | handelse | pa-begaran
+  beskrivning: "När och hur den startar."
+
+laser:
+  - resurs: "Vad som läses"
+    beskrivning: "Vilka delar modellen ser."
+    opalitlig: false                # kan någon utomstående ha format texten? Smittan följer texten.
+    kanslig: false                  # privat, personuppgifter eller organisationens eget material?
+
+skriver:
+  - resurs: "Vart något skrivs"
+    beskrivning: "Vad som skrivs."
+    effekt: rad                     # rad | forslag | angringsbar | oaterkallelig
+    godkannande: ingen              # ingen | fore-varje-handling (krävs för oaterkallelig)
+    # styrs_av_modellen: false      # bara när koden ensam bestämmer mål och innehåll
+    # kodstyrning: "Hur koden bestämmer det."
+
+kommunicerar_externt: []            # allt som går utanför sfären, med godkannande och styrs_av_modellen
+
+riskniva: 1                         # skriv det som scripts/risk.py räknar
+# uppdelning:                       # när ett flöde delats för att undvika nivå 3
+#   beskrivning: "Hur delarna hänger ihop."
+#   delar: [del-ett, del-tva]
+
+datagrind:
+  ingen_arbetsinformation: true
+
+gdpr:
+  personuppgifter: false
+  # rattslig_grund: "..."           # krävs om personuppgifter är true
+  # registrerade: "..."
+
+stack:
+  val: claude-skill                 # claude-skill | claude-agent-sdk | langgraph | system-insight-modul | annan
+  # motivering: "..."               # krävs för annan
+
+modell:
+  leverantor: Anthropic             # ingen för en motor
+
+var_den_kors: claude-chatt          # claude-schemalagd-uppgift | claude-chatt | claude-code-lokalt | system-insight | github-actions | annan
+
+identitet:
+  beskrivning: "Vilken identitet agenten har."
+  nycklar: []                       # namn, omfang, kortlivad, delad_med_annan_agent: false; aldrig värden
+
+konsekvens: informativ              # informativ | angringsbar | mansklig; lägst vad skrivningarna kräver
+lage: av                            # av för ett nytt kontrakt
+
+budget:
+  max_kostnad_kr_per_manad: 0
+  max_steg_per_korning: 20
+
+avstangning:
+  nodstopp: "Hur den stoppas direkt."
+  avveckling: "Hur nycklar återkallas."
+
+provsamling:
+  sokvag: evals/
+  antal_fall: 5                     # nivå 1: minst 5; nivå 2: minst 10
+  injektionsfall: false             # true så fort något läst är opålitligt, och alltid på nivå 2
+
+sakerhetsgranskning:
+  utfall: ej-gjord
+
+kallor: []                          # id:n i källregistret som valen vilar på
+anteckningar: ""

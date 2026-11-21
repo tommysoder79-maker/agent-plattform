@@ -1,0 +1,17 @@
+# Läses av jamfor_facit.py. Skrivs av skapa_fall.py.
+stoppar: false
+antal_kontrakt:
+- 1
+alla:
+  sfar: complexity-insight
+  stack: system-insight-modul
+  validerar: true
+kontrakt:
+- abc: AB-
+  riskniva: 2
+  sort:
+  - ai-steg
+  konsekvens_minst: informativ
+si_idag:
+  sort: agent
+  consequence: human

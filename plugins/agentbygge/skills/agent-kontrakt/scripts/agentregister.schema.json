@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tommysoder79-maker/agent-plattform/schema/agentregister.schema.json",
+  "title": "Agentregister",
+  "description": "Förteckningen över alla agenter i en sfär: vad som finns, i vilket läge, på vilken risknivå och om en avvecklad agents nycklar är återkallade.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "sfar", "agenter"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "sfar": { "enum": ["privat", "forening", "complexity-insight"] },
+    "agenter": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kontrakt", "status"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "kontrakt": { "type": "string", "minLength": 1, "description": "Sökväg till kontrakt.yaml, relativ till registret." },
+          "status": { "enum": ["under-bygge", "aktiv", "pausad", "avvecklad"] },
+          "avvecklad": { "type": "string", "format": "date" },
+          "nycklar_aterkallade": { "type": "boolean" },
+          "anteckning": { "type": "string" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "status": { "const": "avvecklad" } } },
+            "then": {
+              "required": ["avvecklad", "nycklar_aterkallade"],
+              "properties": { "nycklar_aterkallade": { "const": true } }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

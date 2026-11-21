@@ -1,0 +1,4 @@
+schema_version: '1.1'
+name: si-scenarioberattaren
+expected_outcome: |
+  Ett kontrakt med sorten ai-steg, A och B (nivå 2). Förklaringen är råd och drivkraftsförslagen är förslag, så konsekvensen är mansklig. Sammanfattningen nämner att sort och konsekvens avviker.

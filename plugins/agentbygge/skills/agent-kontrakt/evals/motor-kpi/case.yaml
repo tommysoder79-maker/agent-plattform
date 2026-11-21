@@ -1,0 +1,4 @@
+schema_version: '1.1'
+name: motor-kpi
+expected_outcome: |
+  Ett kontrakt med sorten motor och ingen modell: reglerna går att skriva ner. Kalkylarket är privat (B), SCB:s tal läses av kod ur ett känt format (inte A), och raden skrivs av koden (inte C). Nivå 1, sfären privat.

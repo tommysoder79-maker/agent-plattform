@@ -1,0 +1,6 @@
+# Läses av jamfor_facit.py. Skrivs av skapa_fall.py.
+stoppar: true
+antal_kontrakt:
+- 0
+alla: {}
+kontrakt: []
