@@ -1,0 +1,38 @@
+name: release
+
+# Startas av en datumtagg, till exempel 2026.11.21-1.
+on:
+  push:
+    tags: ["20[0-9][0-9].[0-9][0-9].[0-9][0-9]-*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Installera
+        run: pip install -r requirements.txt
+
+      - name: Tester
+        run: python -m pytest -q
+
+      - name: Bygg en zip per skill
+        run: python scripts/bygg_release.py
+
+      - name: Skapa releasen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAGG: ${{ github.ref_name }}
+        run: |
+          shopt -s nullglob
+          filer=(dist/*.zip dist/MANIFEST.txt)
+          gh release create "$TAGG" "${filer[@]}" --title "$TAGG" --generate-notes

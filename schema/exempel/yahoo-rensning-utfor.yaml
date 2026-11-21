@@ -1,0 +1,96 @@
+# Exempel, inte driftsatt. Andra delen av Yahoo-rensningen; se yahoo-rensning-las.
+#
+# Läser aldrig mejlens innehåll, bara den lista du godkänt och meddelande-id.
+# Flyttar till papperskorgen (ångringsbart). Papperskorgen töms för hand.
+schema_version: 1
+id: yahoo-rensning-utfor
+namn: "Yahoo-rensning, utförardel"
+version: 1
+sfar: privat
+agare: Tommy
+skapad: 2026-11-21
+
+behov:
+  beskrivning: "Genomföra den rensning du godkänt, utan att läsa något nytt ur inkorgen."
+
+syfte: "Flyttar de meddelanden som står på den godkända listan till papperskorgen."
+sort: ai-steg
+sort_motivering: "Ett fast arbetsflöde; modellen behövs bara för att rapportera avvikelser i klartext. Kan bli en motor."
+
+utlosare:
+  typ: pa-begaran
+  beskrivning: "Startas för hand när listan är godkänd."
+
+laser:
+  - resurs: "forslag/rensningslista.csv, godkänd version"
+    beskrivning: "Bara de rader du markerat som godkända."
+    opalitlig: false
+    kanslig: true
+  - resurs: "Yahoo-inkorgen (IMAP), bara meddelande-id"
+    beskrivning: "Slår upp meddelanden på id; läser inte ämne eller text."
+    opalitlig: false
+    kanslig: true
+
+skriver:
+  - resurs: "Yahoo-inkorgen"
+    beskrivning: "Flyttar meddelanden på listan till papperskorgen."
+    effekt: angringsbar
+    godkannande: ingen   # listan är redan godkänd i sin helhet
+  - resurs: "forslag/utfall.csv"
+    beskrivning: "Vad som flyttades och vad som inte hittades."
+    effekt: forslag
+    godkannande: ingen
+
+kommunicerar_externt: []
+
+riskniva: 2
+uppdelning:
+  beskrivning: "Se yahoo-rensning-las."
+  delar: [yahoo-rensning-las, yahoo-rensning-utfor]
+
+datagrind:
+  ingen_arbetsinformation: true
+
+gdpr:
+  personuppgifter: true
+  rattslig_grund: "Privat bruk av den egna inkorgen (hushållsundantaget, artikel 2.2 c). Inte juridiskt prövat."
+  registrerade: "Avsändare i den egna inkorgen."
+  bitraden: [Anthropic]
+
+stack:
+  val: claude-skill
+
+modell:
+  leverantor: Anthropic
+
+var_den_kors: claude-chatt
+
+identitet:
+  beskrivning: "Egen inloggning, skild från läsdelens."
+  nycklar:
+    - namn: YAHOO_APP_LOSENORD_UTFOR
+      omfang: "IMAP; verktyget kan bara flytta till papperskorgen, aldrig radera för gott."
+      kortlivad: true   # skapas för körningen och återkallas efteråt
+      delad_med_annan_agent: false
+
+konsekvens: mansklig
+lage: av
+
+budget:
+  max_kostnad_kr_per_manad: 0
+  max_steg_per_korning: 40
+
+avstangning:
+  nodstopp: "Avbryt sessionen och återkalla app-lösenordet."
+  avveckling: "Återkalla app-lösenordet."
+
+provsamling:
+  sokvag: evals/
+  antal_fall: 10
+  injektionsfall: true
+  matt: "Flyttar exakt det som står på listan, inget annat."
+
+sakerhetsgranskning:
+  utfall: ej-gjord
+
+kallor: [meta-rule-of-two]

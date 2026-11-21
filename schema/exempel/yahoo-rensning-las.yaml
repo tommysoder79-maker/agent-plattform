@@ -1,0 +1,98 @@
+# Exempel, inte driftsatt. Första delen av Yahoo-rensningen.
+#
+# Att låta en agent läsa inkorgen och radera i samma session ger A, B och C
+# (nivå 3). Därför delas flödet i två delar:
+#   1. Den här delen läser och föreslår en lista. Den raderar inget och når
+#      inget utanför inkorgen. A + B = nivå 2.
+#   2. yahoo-rensning-utfor läser bara den lista du godkänt och flyttar de
+#      meddelandena till papperskorgen. B + C = nivå 2.
+# Att tömma papperskorgen, det enda oåterkalleliga steget, gör du själv.
+schema_version: 1
+id: yahoo-rensning-las
+namn: "Yahoo-rensning, läsdel"
+version: 1
+sfar: privat
+agare: Tommy
+skapad: 2026-11-21
+
+behov:
+  beskrivning: "Rensa den gamla Yahoo-adressen och hitta vilka tjänster som är kopplade till den, så att de kan flyttas till en adress med egen domän."
+
+syfte: "Läser inkorgen och föreslår vad som kan raderas och vilka tjänster som är kopplade till adressen."
+sort: agent
+sort_motivering: "Vilka mejl som hör till en tjänst går inte att bestämma med fasta regler; avsändare, ämnen och format varierar."
+
+utlosare:
+  typ: pa-begaran
+  beskrivning: "Startas för hand, en mapp eller ett datumintervall åt gången."
+
+laser:
+  - resurs: "Yahoo-inkorgen (IMAP, bara läsning)"
+    beskrivning: "Avsändare, ämne, datum och text i mejlen."
+    opalitlig: true    # vem som helst kan skicka ett mejl med instruktioner i
+    kanslig: true      # privat inkorg med andras personuppgifter
+
+skriver:
+  - resurs: "forslag/rensningslista.csv"
+    beskrivning: "Meddelande-id, avsändare, skäl och föreslagen åtgärd. Ingenting händer förrän du godkänt listan."
+    effekt: forslag
+    godkannande: ingen
+  - resurs: "forslag/kopplade-tjanster.csv"
+    beskrivning: "Tjänster som verkar använda adressen, med det mejl som visar det."
+    effekt: forslag
+    godkannande: ingen
+
+kommunicerar_externt: []   # ingen webbåtkomst, inga utskick
+
+riskniva: 2
+uppdelning:
+  beskrivning: "Läsdelen föreslår, du godkänner listan, utförardelen flyttar bara det som står på den."
+  delar: [yahoo-rensning-las, yahoo-rensning-utfor]
+
+datagrind:
+  ingen_arbetsinformation: true
+
+gdpr:
+  personuppgifter: true
+  rattslig_grund: "Privat bruk av den egna inkorgen (hushållsundantaget, artikel 2.2 c). Inte juridiskt prövat."
+  registrerade: "Avsändare och mottagare i den egna inkorgen."
+  bitraden: [Anthropic]
+
+stack:
+  val: claude-skill
+  motivering: "En session i taget, inget som behöver överleva omstarter."
+
+modell:
+  leverantor: Anthropic
+
+var_den_kors: claude-chatt
+
+identitet:
+  beskrivning: "Egen inloggning bara för den här delen."
+  nycklar:
+    - namn: YAHOO_APP_LOSENORD_LAS
+      omfang: "IMAP. Yahoos app-lösenord ger full åtkomst, så läsbegränsningen ligger i verktyget, som bara kan läsa."
+      kortlivad: false
+      delad_med_annan_agent: false
+
+konsekvens: mansklig
+lage: av
+
+budget:
+  max_kostnad_kr_per_manad: 0   # körs inom Max-abonnemanget
+  max_steg_per_korning: 60
+
+avstangning:
+  nodstopp: "Avbryt sessionen och återkalla app-lösenordet i Yahoos säkerhetsinställningar."
+  avveckling: "Återkalla app-lösenordet och ta bort det ur alla anteckningar."
+
+provsamling:
+  sokvag: evals/
+  antal_fall: 10
+  injektionsfall: true
+  matt: "Andel rätt föreslagna mejl; inga följda instruktioner ur mejlens text."
+
+sakerhetsgranskning:
+  utfall: ej-gjord
+
+kallor: [meta-rule-of-two, owasp-agentic-top10-2026]

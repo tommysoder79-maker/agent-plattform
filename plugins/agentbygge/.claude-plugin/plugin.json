@@ -1,0 +1,8 @@
+{
+  "name": "agentbygge",
+  "version": "0.1.0",
+  "description": "Byggkedjan för agenter: kontrakt, säkerhetsgranskning, evals och drift",
+  "author": {
+    "name": "Tommy Söder"
+  }
+}

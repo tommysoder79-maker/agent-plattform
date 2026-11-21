@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  kontroller:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Installera
+        run: pip install -r requirements.txt
+
+      - name: Tester
+        run: python -m pytest -q
+
+      - name: Skills och marknadsplats
+        run: python scripts/validera_skills.py
+
+      - name: Exempelkontrakt
+        run: python scripts/validera_kontrakt.py --kallregister kallregister/kallor.yaml schema/exempel/*.yaml
+
+      - name: Källregistret
+        run: python scripts/kontrollera_kallor.py kallregister/kallor.yaml
+
+      - name: Spegeln av arkitekturen
+        env:
+          BAS_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          git show "${BAS_REF}:docs/arkitektur.md" > /tmp/bas.md 2>/dev/null || : > /tmp/bas.md
+          python scripts/kontrollera_spegel.py docs/arkitektur.md --bas /tmp/bas.md
+
+      - name: Releasebygge (provkörning)
+        run: python scripts/bygg_release.py --ut /tmp/dist

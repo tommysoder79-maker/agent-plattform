@@ -1,0 +1,262 @@
+# Källregistret: det som skillsens val och regler vilar på.
+#
+# niva     1 = specifikation eller standardorgan, 2 = leverantörens egen text,
+#            3 = sekundärkälla (bara pekare, får aldrig bära ett beslut)
+# lasniva  original | extraktion | andra-hand | ej-last  (som i skillen registrera-kalla:
+#            extraktion = läst via sökträffar, WebFetch eller utdrag)
+# verifierad  datum då påståendet i "galler" senast kontrollerades mot källan; null = aldrig
+# bar_beslut  får källan ensam bära ett beslut? Kräver nivå 1–2 och läsnivå original eller extraktion.
+#
+# scripts/kontrollera_kallor.py varnar när en källa som bär beslut inte verifierats på 90 dagar.
+schema_version: 1
+kallor:
+  # Designprinciper
+  - id: anthropic-building-effective-agents
+    titel: "Building effective agents"
+    utgivare: Anthropic
+    url: https://www.anthropic.com/engineering/building-effective-agents
+    niva: 2
+    typ: vagledning
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Skillnaden mellan workflow och agent; välj den enklaste lösningen och öka komplexiteten bara när det behövs."
+
+  - id: anthropic-context-engineering
+    titel: "Effective context engineering for AI agents"
+    utgivare: Anthropic
+    url: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+    niva: 2
+    typ: vagledning
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Kontexten är en begränsad resurs; återkallningen sjunker när kontexten växer (context rot)."
+
+  - id: anthropic-evals
+    titel: "Demystifying evals for AI agents"
+    utgivare: Anthropic
+    url: https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents
+    niva: 2
+    typ: vagledning
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Testfall ur verkliga fel; capability- och regressionsevals; bedöm utfall, inte vägen."
+
+  - id: openai-practical-guide
+    titel: "A practical guide to building agents"
+    utgivare: OpenAI
+    url: https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/
+    niva: 2
+    typ: vagledning
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Pröva om användningsfallet kräver en agent; annars räcker ofta en deterministisk lösning."
+
+  # Öppna standarder
+  - id: linux-foundation-aaif
+    titel: "Linux Foundation Announces the Formation of the Agentic AI Foundation"
+    utgivare: Linux Foundation
+    url: https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation
+    niva: 1
+    typ: standardorgan
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "AAIF bildades 2025-12-09 med MCP, goose och AGENTS.md som första projekt."
+
+  - id: aaif-a2a
+    titel: "A2A joins AAIF's open agentic stack"
+    utgivare: Agentic AI Foundation
+    url: https://aaif.io/blog/a2a-joins-aaif
+    niva: 1
+    typ: standardorgan
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "A2A v1.0 var den första stabila specifikationen (mars 2026); A2A blev ett AAIF-projekt 2026-08-17."
+
+  - id: mcp-spec
+    titel: "Model Context Protocol, specifikationen"
+    utgivare: Agentic AI Foundation
+    url: https://modelcontextprotocol.io
+    niva: 1
+    typ: specifikation
+    lasniva: ej-last
+    verifierad: null
+    bar_beslut: false
+    galler: "Hur agenter kopplas till verktyg och data."
+    anmarkning: "Inte läst i den session som byggde registret. Läses innan en skill vilar på detaljer i protokollet."
+
+  - id: agent-skills-spec
+    titel: "Agent Skills, specifikationen"
+    utgivare: Agentic AI Foundation
+    url: https://agentskills.io/specification
+    niva: 1
+    typ: specifikation
+    lasniva: ej-last
+    verifierad: null
+    bar_beslut: false
+    galler: "Formatet för skills: mapp med SKILL.md, frontmatter, scripts/, references/, assets/."
+    anmarkning: "Hämtningen 2026-11-21 krävde ett godkännande som inte besvarades. Validatorn följer i stället anthropic-skill-validator."
+
+  - id: anthropic-agent-skills-aaif
+    titel: "Donating Agent Skills to the Agentic AI Foundation"
+    utgivare: Anthropic
+    url: https://www.anthropic.com/news/donating-agent-skills-to-the-agentic-ai-foundation
+    niva: 2
+    typ: dokumentation
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Agent Skills är en öppen standard under AAIF, integrerad i över 70 agentplattformar."
+
+  - id: anthropic-skill-validator
+    titel: "skill-creator: scripts/quick_validate.py och package_skill.py"
+    utgivare: Anthropic
+    niva: 2
+    typ: dokumentation
+    lasniva: original
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Vad claude.ai godtar vid uppladdning: fälten name, description, license, allowed-tools, metadata, compatibility; namn i kebab-case högst 64 tecken; beskrivning högst 1024 tecken utan vinkelparenteser; exakt en SKILL.md; evals/ i roten packas inte."
+    anmarkning: "Läst i den synkade kopian av skillen skill-creator i en Claude-session."
+
+  # Säkerhet och styrning
+  - id: owasp-agentic-top10-2026
+    titel: "OWASP Top 10 for Agentic Applications for 2026"
+    utgivare: OWASP GenAI Security Project
+    url: https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
+    niva: 1
+    typ: standardorgan
+    lasniva: andra-hand
+    verifierad: 2026-11-21
+    bar_beslut: false
+    galler: "Tio risker ASI01–ASI10 för agentiska system, publicerade 2025-12-09."
+    anmarkning: "Namnen på ASI01–ASI10 är bekräftade i flera sekundärkällor; OWASP:s webbsida listar dem inte. PDF:en läses i original innan skillen agent-sakerhetsgranskning byggs."
+
+  - id: meta-rule-of-two
+    titel: "Agents Rule of Two: A Practical Approach to AI Agent Security"
+    utgivare: Meta
+    url: https://ai.meta.com/blog/practical-ai-agent-security/
+    niva: 2
+    typ: vagledning
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Inom en session högst två av: bearbetar opålitlig indata, har åtkomst till känslig data, ändrar tillstånd eller kommunicerar externt."
+
+  - id: nist-caisi-agent-standards
+    titel: "AI Agent Standards Initiative"
+    utgivare: NIST CAISI
+    url: https://www.nist.gov/caisi/ai-agent-standards-initiative
+    niva: 1
+    typ: standardorgan
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Initiativ från 2026-02-17 för standarder för säkerhet, identitet och samverkan mellan agenter."
+
+  - id: nccoe-agent-identity
+    titel: "Accelerating the Adoption of Software and AI Agent Identity and Authorization"
+    utgivare: NIST NCCoE
+    url: https://pages.nist.gov/nccoe-ai-identity/
+    niva: 1
+    typ: standardorgan
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Befintliga identitetsstandarder (OAuth med flera) ska tillämpas på agenter i stället för en parallell identitetsstack."
+
+  - id: csa-nist-agent-security
+    titel: "NIST AI Agent Security: Red-Teaming Guidance and Enterprise Compliance"
+    utgivare: Cloud Security Alliance
+    url: https://labs.cloudsecurityalliance.org/research/csa-research-note-nist-ai-agent-red-teaming-standards-202603/
+    niva: 3
+    typ: sekundar
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: false
+    galler: "Pekare till NIST AI 100-2 (taxonomi för adversariell ML), som utvidgats till agenter."
+
+  - id: otel-genai-semconv
+    titel: "Semantic Conventions for GenAI agent and framework spans"
+    utgivare: OpenTelemetry
+    url: https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-agent-spans/
+    niva: 1
+    typ: specifikation
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Konventionerna har status Development; använd dem utan att bygga in er."
+
+  # Ramverk
+  - id: ms-agent-framework
+    titel: "Microsoft Agent Framework 1.0"
+    utgivare: Microsoft
+    url: https://devblogs.microsoft.com/agent-framework/
+    niva: 2
+    typ: dokumentation
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "1.0 (GA) i april 2026; efterträdare till Semantic Kernel och AutoGen."
+
+  - id: langgraph-1
+    titel: "LangChain and LangGraph Agent Frameworks Reach v1.0 Milestones"
+    utgivare: LangChain
+    url: https://blog.langchain.com/langchain-langgraph-1dot0
+    niva: 2
+    typ: dokumentation
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "LangGraph 1.0 med körning som överlever omstarter (durable execution)."
+
+  - id: google-adk
+    titel: "Agent Development Kit"
+    utgivare: Google
+    url: https://developers.googleblog.com/agent-development-kit-easy-to-build-multi-agent-applications/
+    niva: 2
+    typ: dokumentation
+    lasniva: andra-hand
+    verifierad: 2026-11-21
+    bar_beslut: false
+    galler: "ADK 1.0 för Python, Go, Java och TypeScript i april 2026."
+    anmarkning: "Lanseringen 2025 är läst hos Google; 1.0-uppgiften bärs av andra hand."
+
+  # Claude
+  - id: claude-skills-support
+    titel: "Use skills in Claude"
+    utgivare: Anthropic
+    url: https://support.claude.com/en/articles/12512180
+    niva: 2
+    typ: dokumentation
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "På Pro och Max laddas egna skills upp som zip under Customize > Skills och är privata för kontot."
+
+  - id: claude-org-skills
+    titel: "Provision and manage skills for your organization"
+    utgivare: Anthropic
+    url: https://support.claude.com/en/articles/13119606
+    niva: 2
+    typ: dokumentation
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "Team och Enterprise kan provisionera skills för organisationen; synk från GitHub kräver Team eller Enterprise."
+
+  - id: claude-code-marketplaces
+    titel: "Create a marketplace"
+    utgivare: Anthropic
+    url: https://code.claude.com/docs/en/plugin-marketplaces
+    niva: 2
+    typ: dokumentation
+    lasniva: extraktion
+    verifierad: 2026-11-21
+    bar_beslut: true
+    galler: "marketplace.json kräver name, owner och plugins; varje post name och source; relativa sökvägar från roten utan '..'; postens namn ska vara lika med namnet i plugin.json."

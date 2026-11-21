@@ -1,0 +1,14 @@
+{
+  "name": "agent-plattform",
+  "description": "Skills för att bygga, granska, testa och driva agenter",
+  "owner": {
+    "name": "Tommy Söder"
+  },
+  "plugins": [
+    {
+      "name": "agentbygge",
+      "source": "./plugins/agentbygge",
+      "description": "Byggkedjan: agent-kontrakt, agent-sakerhetsgranskning, agent-evals och agent-drift"
+    }
+  ]
+}
