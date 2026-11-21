@@ -19,7 +19,7 @@ Läs repots `AGENTS.md`, `ARCHITECTURE.md` och `docs/sakerhet.md` (hotmodell, ko
 
 ## Var granskningen läggs
 
-Granskningarna läggs i `docs/granskning-agenter-<datum>/<modul>.md` i `systeminsights`, i en gren och som pull request. Ändra inte `docs/malarkitektur.md` i samma pull request: den är en spegel av projektets master, och mastern uppdateras i Claude-projektet "Complexity insight" när användaren beslutat om fynden.
+Granskningarna läggs i `docs/granskning-agenter-<datum>/<modul>/` i `systeminsights` (kontrakt, granskning.yaml och granskning.md), i en gren och som pull request. CI kontrollerar YAML-filer med Prettier, så kör `npx prettier --write "docs/granskning-agenter-<datum>/**/*.yaml"` innan push; Markdown kontrolleras inte. Ändra inte `docs/malarkitektur.md` i samma pull request: den är en spegel av projektets master, och mastern uppdateras i Claude-projektet "Complexity insight" när användaren beslutat om fynden.
 
 ## Fynd blir issues
 
